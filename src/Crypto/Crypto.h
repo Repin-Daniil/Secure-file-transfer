@@ -17,7 +17,7 @@ class Crypto {
 
   std::filesystem::path EncryptFile(std::filesystem::path file_path);
   std::string DecryptFile(std::filesystem::path file_path);
-  std::string getPublicKeyAsPEM();
+  std::string GetPublicKeyAsString();
 
  private:
   RSA *public_key_;
@@ -25,15 +25,15 @@ class Crypto {
   std::pair<bool, bool> keys_ = std::pair(false, false);
 
   // Methods
-  RSA *createPublicKeyFromPEMString(const std::string &pemString);
-  RSA *readPublicKeyFromPEM(const std::string &publicKeyFilePath);
-  RSA *readPrivateKeyFromPEM(const std::string &privateKeyFilePath);
-  std::vector<unsigned char> readFileBytes(const std::string &filePath);
-  void writeFileBytes(const std::string &filePath, const std::vector<unsigned char> &fileBytes);
-  std::vector<unsigned char> performEncryption(RSA *publicKey, const std::vector<unsigned char> &data);
-  std::vector<unsigned char> performDecryption(RSA *privateKey, const std::vector<unsigned char> &encryptedData);
-  std::vector<unsigned char> encryptWithPublicKey(RSA *publicKey, const std::vector<unsigned char> &data);
-  std::vector<unsigned char> decryptWithPrivateKey(RSA *privateKey, const std::vector<unsigned char> &encryptedData);
+  RSA *CreatePublicKeyFromString(const std::string &pemString);
+  RSA *ReadPublicKeyFromPEM(const std::string &publicKeyFilePath);
+  RSA *ReadPrivateKeyFromPEM(const std::string &privateKeyFilePath);
+  std::vector<unsigned char> ReadFileBytes(const std::string &filePath);
+  void WriteFileBytes(const std::string &filePath, const std::vector<unsigned char> &fileBytes);
+  std::vector<unsigned char> PerformEncryption(RSA *publicKey, const std::vector<unsigned char> &data);
+  std::vector<unsigned char> PerformDecryption(RSA *privateKey, const std::vector<unsigned char> &encryptedData);
+  std::vector<unsigned char> EncryptWithPublicKey(RSA *publicKey, const std::vector<unsigned char> &data);
+  std::vector<unsigned char> DecryptWithPrivateKey(RSA *privateKey, const std::vector<unsigned char> &encryptedData);
 };
 
 } // namespace crypto

@@ -5,6 +5,9 @@ namespace network {
 void Server::Start(unsigned int port) {
   boost::system::error_code ec;
 
+  std::filesystem::path tmp_path = std::filesystem::current_path() / "tmp";
+  std::filesystem::create_directory(tmp_path);
+
   std::cout << "Waiting for connection"sv << std::endl;
 
   tcp::acceptor acceptor(io_context_, tcp::endpoint(tcp::v4(), port));
@@ -29,7 +32,7 @@ void Server::SendPublicKey(const std::string &public_key) {
 fs::path Server::DownloadFile() {
   auto file_data = GetNameAndSize(ReadFromSocket());
 
-  std::string file_name = "uploaded_"s + file_data.first;
+  std::string file_name = file_data.first;
   uint64_t file_size = file_data.second;
 
   std::cout << "File name: " << file_name << std::endl;

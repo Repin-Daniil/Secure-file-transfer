@@ -26,11 +26,13 @@ void Application::Send(std::string_view server_ip,
 
   auto public_key = client.RequestServerPublicKey();
   crypto::Crypto crypto(public_key);
-
-  auto encrypted_file_path = crypto.EncryptFile(file_path);
-
-  client.SendFile({encrypted_file_path.filename(), fs::file_size(encrypted_file_path),
-                   {encrypted_file_path, std::ios::binary}});
+  try {
+    auto encrypted_file_path = crypto.EncryptFile(file_path);
+    client.SendFile({encrypted_file_path.filename(), fs::file_size(encrypted_file_path),
+                     {encrypted_file_path, std::ios::binary}});
+  } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
+  }
 }
 
 void Application::Listen(unsigned int port,
@@ -41,11 +43,15 @@ void Application::Listen(unsigned int port,
 
   server.Start(port);
 
-  auto public_key = crypto.getPublicKeyAsPEM();
+  auto public_key = crypto.GetPublicKeyAsString();
   server.SendPublicKey(public_key);
 
   auto encrypted_file_path = server.DownloadFile();
-  std::string decrypted_file_name = crypto.DecryptFile(encrypted_file_path);
+  try {
+    std::string decrypted_file_name = crypto.DecryptFile(encrypted_file_path);
+  } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
+  }
 }
 
 } // namespace app
