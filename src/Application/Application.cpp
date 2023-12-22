@@ -6,6 +6,7 @@
 #include "Application.h"
 #include "../Network/Server.h"
 #include "../Network/Client.h"
+#include "../Crypto/Crypto.h"
 
 namespace app {
 
@@ -22,9 +23,12 @@ void Application::Send(std::string_view server_ip,
 
   network::Client client;
   client.Connect(server_ip, port);
+
   auto public_key = client.RequestServerPublicKey();
-  //TODO шифруем файл
-  client.SendFile({file_path.filename(), fs::file_size(file_path), {file_path, std::ios::binary}});
+  crypto::Crypto crypto(public_key);
+
+  auto encrypted_file_path = crypto.EncryptFile(file_path);
+  client.SendFile({encrypted_file_path.filename(), fs::file_size(encrypted_file_path), {encrypted_file_path, std::ios::binary}});
   //TODO Удаляем зашифрованный файл
 }
 
@@ -32,9 +36,10 @@ std::filesystem::path Application::Listen(unsigned int port, std::string public_
   network::Server server(port);
   server.Start();
   server.SendPublicKey(public_rsa_key);
-  server.GetFile();
+  auto encrypted_file_path = server.GetFile();
 
-  //TODO Расшифровать
+  crypto::Crypto crypto(public_rsa_key, private_rsa_key);
+  std::string decrypted_file_name = crypto.DecryptFile(encrypted_file_path);
 
   return fs::current_path();
 }

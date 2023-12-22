@@ -24,7 +24,7 @@ add_executable(safe_tunnel src/main.cpp
 
         src/Application/Application.cpp
         src/Network/Client.cpp
-        src/Network/Server.cpp)
+        src/Network/Server.cpp src/Crypto/Crypto.h src/Crypto/Crypto.cpp)
 
 target_link_libraries(safe_tunnel PRIVATE Threads::Threads
         OpenSSL::SSL
