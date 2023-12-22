@@ -47,38 +47,34 @@ std::string Client::RequestServerPublicKey() {
 void Client::SendFile(Package package) {
   boost::system::error_code ec;
 
-  socket_.write_some(boost::asio::buffer(package.file_name + "\n"), ec);
+  net::write(socket_,
+             boost::asio::buffer(
+                 "FileName(" + package.file_name + "); FileSize(" + std::to_string(package.file_size) + ")\n"),
+             ec);
 
   if (ec) {
-    throw std::runtime_error("Error sending FileName");
+    throw std::runtime_error("Error sending FileName and FileSize");
   }
 
-  socket_.write_some(boost::asio::buffer(std::to_string(package.file_size) + "\n"), ec);
-  std::cout << "File name: " << package.file_name << "\nFile size: " << package.file_size << std::endl;
 
-  if (ec) {
-    throw std::runtime_error("Error sending FileSize");
+  std::array<char, 10000> file_buffer;
+  std::uint64_t bytes_sent = 0;
+  std::size_t buffer_size = file_buffer.size();
+
+  while (package.stream) {
+    package.stream.read(file_buffer.data(), buffer_size);
+    bytes_sent += net::write(socket_, boost::asio::buffer(file_buffer.data(), package.stream.gcount()), ec);
   }
 
-  //TODO
-//  std::uintmax_t sentFileBody = 0;
-//  char fileBuf[10000];
-//  std::size_t fileBufSize = sizeof(fileBuf);
-//
-//  while(package.stream){
-//    package.stream.read(fileBuf, fileBufSize);
-//    sentFileBody += socket_.write_some(boost::asio::buffer(fileBuf, package.stream.gcount()), ec); // net::transfer_exactly
-//  }
-//
-//  if(sentFileBody != package.file_size){
-//    throw std::runtime_error("Package sending failed");
-//  }
-//
-//  std::cout << "sentFileName = " << package.file_name << std::endl
-//            << "sentFileSize = " << package.file_size << std::endl
-//            << "sentFileBody = " << sentFileBody << std::endl;
-//
-//  package.stream.close();
+  if (bytes_sent != package.file_size) {
+    throw std::runtime_error("Package sending failed");
+  }
+
+  std::cout << "File Name: " << package.file_name << std::endl
+            << "File Size: " << package.file_size << std::endl
+            << "Bytes sent: " << bytes_sent << std::endl;
+
+  package.stream.close();
 }
 
 } // namespace network

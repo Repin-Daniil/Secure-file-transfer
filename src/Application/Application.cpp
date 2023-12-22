@@ -23,7 +23,6 @@ void Application::Send(std::string_view server_ip,
   network::Client client;
   client.Connect(server_ip, port);
   auto public_key = client.RequestServerPublicKey();
-  std::cout << public_key << std::endl;
   //TODO шифруем файл
   client.SendFile({file_path.filename(), fs::file_size(file_path), {file_path, std::ios::binary}});
   //TODO Удаляем зашифрованный файл

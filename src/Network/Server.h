@@ -1,11 +1,14 @@
 #pragma once
 #include <boost/asio.hpp>
+#include <filesystem>
 
 namespace network {
 
 namespace net = boost::asio;
+namespace fs = std::filesystem;
 
 using net::ip::tcp;
+using namespace fs;
 using namespace std::literals;
 
 class Server {
