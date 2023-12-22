@@ -22,32 +22,26 @@ void Application::Send(std::string_view server_ip,
   }
 
   network::Client client;
+
   client.Connect(server_ip, port);
   auto public_key = client.RequestServerPublicKey();
   crypto::Crypto crypto(public_key);
 
   auto encrypted_file_path = crypto.EncryptFile(file_path);
   client.SendFile({encrypted_file_path.filename(), fs::file_size(encrypted_file_path), {encrypted_file_path, std::ios::binary}});
-
-  //TODO Удаляем зашифрованный файл
 }
 
 std::filesystem::path Application:: Listen(unsigned int port, const std::string& public_rsa_key, const std::string& private_rsa_key) {
   network::Server server(port);
-  std::cout << "0 a" << std::endl;
-  server.Start();
-  std::cout << "0 b" << std::endl;
-
   crypto::Crypto crypto(public_rsa_key, private_rsa_key);
-  std::cout << "0 c" << std::endl;
-  auto pubkey = crypto.getPublicKeyAsPEM();
-  std::cout << "0 d" << std::endl;
-  std::cout << "1 " << pubkey << std::endl;
-  server.SendPublicKey(pubkey);
+
+  server.Start();
+
+  auto public_key = crypto.getPublicKeyAsPEM();
+  server.SendPublicKey(public_key);
+
   auto encrypted_file_path = server.DownloadFile();
   std::string decrypted_file_name = crypto.DecryptFile(encrypted_file_path);
-
-  //TODO Удаляем зашифрованный файл
 
   return fs::current_path();
 }

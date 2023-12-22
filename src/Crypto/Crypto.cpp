@@ -243,4 +243,4 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
   return decryptedFileName;
 }
 
-}
+} // namespace crypto

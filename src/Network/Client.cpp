@@ -47,6 +47,8 @@ void Client::SendFile(Package package) {
     throw std::runtime_error("Error sending FileName and FileSize");
   }
 
+  std::cout << "Upload start" << std::endl;
+
   std::array<char, 10000> file_buffer{};
   uint64_t bytes_sent = 0;
   size_t buffer_size = file_buffer.size();
@@ -66,6 +68,7 @@ void Client::SendFile(Package package) {
             << "File Size: " << package.file_size << std::endl
             << "Bytes sent: " << bytes_sent << std::endl;
 
+  std::cout << "Waiting for server's response" << std::endl;
   std::cout << Read();
 }
 
