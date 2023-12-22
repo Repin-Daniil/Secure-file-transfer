@@ -14,14 +14,13 @@ int main(int argc, char **argv) {
                         "-----END PUBLIC KEY-----";
 
   try {
-    if (argc == 3 && argv[1] == "server"sv) {
-      app.Listen(*argv[2], pub_key, "private key"s);
-    } else if (argc == 7 && argv[1] == "client"sv) {
+    if (argc == 5 && argv[1] == "server"sv) {
+      app.Listen(*argv[2], argv[3], argv[4]);
+    } else if (argc == 5 && argv[1] == "client"sv) {
       app.Send(argv[2], static_cast<unsigned int>(*argv[3]), argv[4]);
     } else {
-      std::cout << "Usage: "sv << argv[0] << " server <port>"sv << std::endl;
-      std::cout << "Usage: "sv << argv[0] << " client <server IP>, <server port>, <file path>,"
-                                             " <RSA-pubkey-path>, <RSA-private-key-path>"sv << std::endl;
+      std::cout << "Usage: "sv << argv[0] << " server <port>, <RSA-pubkey-path>, <RSA-private-key-path>"sv << std::endl;
+      std::cout << "Usage: "sv << argv[0] << " client <server IP>, <server port>, <file path>" << std::endl;
 
       return 1;
     }

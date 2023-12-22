@@ -32,13 +32,19 @@ void Application::Send(std::string_view server_ip,
   //TODO Удаляем зашифрованный файл
 }
 
-std::filesystem::path Application::Listen(unsigned int port, const std::string& public_rsa_key, const std::string& private_rsa_key) {
+std::filesystem::path Application:: Listen(unsigned int port, const std::string& public_rsa_key, const std::string& private_rsa_key) {
   network::Server server(port);
+  std::cout << "0 a" << std::endl;
   server.Start();
-  server.SendPublicKey(public_rsa_key);
-  auto encrypted_file_path = server.DownloadFile();
+  std::cout << "0 b" << std::endl;
 
   crypto::Crypto crypto(public_rsa_key, private_rsa_key);
+  std::cout << "0 c" << std::endl;
+  auto pubkey = crypto.getPublicKeyAsPEM();
+  std::cout << "0 d" << std::endl;
+  std::cout << "1 " << pubkey << std::endl;
+  server.SendPublicKey(pubkey);
+  auto encrypted_file_path = server.DownloadFile();
   std::string decrypted_file_name = crypto.DecryptFile(encrypted_file_path);
 
   //TODO Удаляем зашифрованный файл

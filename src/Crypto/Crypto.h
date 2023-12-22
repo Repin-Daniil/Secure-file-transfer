@@ -16,13 +16,13 @@ class Crypto {
 
   std::filesystem::path EncryptFile(std::filesystem::path file_path);
   std::string DecryptFile(std::filesystem::path file_path);
+  std::string getPublicKeyAsPEM();
 
  private:
   // Methods
-  std::string getPublicKeyAsPEM(RSA* publicKey);
   RSA* createPublicKeyFromPEMString(const std::string& pemString);
   RSA *readPublicKeyFromPEM(const std::string &publicKeyFilePath);
-  RSA *readPrivateKeyFromPEM(const std::string &privateKeyFilePath;
+  RSA *readPrivateKeyFromPEM(const std::string &privateKeyFilePath);
   std::vector<unsigned char> readFileBytes(const std::string &filePath);
   void writeFileBytes(const std::string &filePath, const std::vector<unsigned char> &fileBytes);
   std::vector<unsigned char> performEncryption(RSA *publicKey, const std::vector<unsigned char> &data);

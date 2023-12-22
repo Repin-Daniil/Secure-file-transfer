@@ -2,9 +2,9 @@
 
 namespace crypto {
 
-std::string Crypto::getPublicKeyAsPEM(RSA *publicKey) {
+std::string Crypto::getPublicKeyAsPEM() {
   BIO *bio = BIO_new(BIO_s_mem());
-  PEM_write_bio_RSA_PUBKEY(bio, publicKey);
+  PEM_write_bio_RSA_PUBKEY(bio, public_key_);
 
   char *bufferPtr;
   long length = BIO_get_mem_data(bio, &bufferPtr);
@@ -46,9 +46,6 @@ RSA *Crypto::readPublicKeyFromPEM(const std::string &publicKeyFilePath) {
   }
 
   fclose(publicKeyFile);
-
-  // Вывод публичного ключа в std::cout
-  //RSA_print_fp(stdout, rsa, 0);
 
   return rsa;
 }
@@ -203,23 +200,33 @@ Crypto::~Crypto() {
 }
 
 std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
-  std::vector<unsigned char> fileData = Crypto::readFileBytes(file_path.string());
-  std::vector<unsigned char> encryptedFileData = Crypto::encryptWithPublicKey(public_key_, fileData);
-
-  // Конструируем путь к папке "tmp"
-  std::filesystem::path tmp_path = std::filesystem::temp_directory_path() / "tmp";
-
-  // Если папки "tmp" не существует, то создаем ее
-  if (!std::filesystem::exists(tmp_path)) {
-    std::filesystem::create_directory(tmp_path);
+  if(!std::filesystem::exists(file_path)) {
+    throw std::runtime_error("Error: File not found");
   }
 
-  // Конструируем путь к зашифрованному файлу в папке "tmp"
-  std::string encrypted_file_name = "encrypted_" + file_path.stem().string() + file_path.extension().string();
-  std::filesystem::path encrypted_file_path = tmp_path / encrypted_file_name;
+  // Открываем файл и получаем его размер
+  std::ifstream fileStream(file_path, std::ios::binary | std::ios::ate);
+  if (!fileStream.is_open()) {
+    throw std::runtime_error("Error: Unable to open file");
+  }
+  std::streamsize fileSize = fileStream.tellg();
+  fileStream.seekg(0, std::ios::beg);
 
-  // Записываем зашифрованные данные в файл в папке "tmp"
-  Crypto::writeFileBytes(encrypted_file_path.string(), encryptedFileData);
+  // Чтение данных из файла
+  std::vector<unsigned char> fileData(fileSize);
+  if(!fileStream.read(reinterpret_cast<char*>(fileData.data()), fileSize)) {
+    throw std::runtime_error("Error: Unable to read file");
+  }
+
+  // Шифрование данных
+  std::vector<unsigned char> encryptedFileData = encryptWithPublicKey(public_key_, fileData);
+
+  // Формирование имени зашифрованного файла
+  std::filesystem::path current_dir = std::filesystem::current_path();
+  std::filesystem::path encrypted_file_path = current_dir / ("encrypted_" + file_path.filename().string());
+
+  // Запись зашифрованных данных в файл
+  writeFileBytes(encrypted_file_path.string(), encryptedFileData);
 
   return encrypted_file_path;  // Возвращаем путь к зашифрованному файлу
 }

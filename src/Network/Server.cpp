@@ -19,8 +19,10 @@ void Server::Start() {
 
 void Server::SendPublicKey(const std::string& public_key) {
   boost::system::error_code ec;
+  std::cout << "2 " << public_key << std::endl;
   socket_.write_some(net::buffer(public_key + "\n"), ec);
 
+  std::cout << "3 " << std::endl;
   if (ec) {
     throw std::runtime_error("Error while sending public key");
   }
@@ -29,7 +31,7 @@ void Server::SendPublicKey(const std::string& public_key) {
 fs::path Server::DownloadFile() {
   auto file_data = GetNameAndSize(ReadFromSocket());
 
-  std::string file_name = file_data.first;
+  std::string file_name = "uploaded_"s + file_data.first;
   uint64_t file_size = file_data.second;
 
   std::cout << "File name: " << file_name << std::endl;
