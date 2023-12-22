@@ -38,7 +38,7 @@ fs::path Server::DownloadFile() {
   std::cout << "File name: " << file_name << std::endl;
   std::cout << "File size: " << file_size << std::endl;
 
-  auto path = fs::current_path().c_str() + "/"s + file_name;
+  auto path = fs::current_path().c_str() + "/tmp/"s + file_name;
   std::ofstream output_file_stream(path, std::ios::binary);
 
   if (!output_file_stream) {
