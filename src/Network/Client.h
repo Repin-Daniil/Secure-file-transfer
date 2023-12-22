@@ -27,6 +27,9 @@ class Client {
  private:
   net::io_context io_context_;
   tcp::socket socket_{io_context_};
+
+  // Methods
+  std::string Read();
 };
 
 } // namespace network
