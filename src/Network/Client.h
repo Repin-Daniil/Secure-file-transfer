@@ -20,6 +20,7 @@ struct Package {
 
 class Client {
  public:
+  // Methods
   void Connect(std::string_view ip_address, unsigned int port);
   std::string RequestServerPublicKey();
   void SendFile(Package package);

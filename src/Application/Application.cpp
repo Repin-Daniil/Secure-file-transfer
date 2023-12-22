@@ -1,6 +1,5 @@
 #include <string_view>
 #include <filesystem>
-#include <fstream>
 #include <iostream>
 
 #include "Application.h"
@@ -24,26 +23,29 @@ void Application::Send(std::string_view server_ip,
   network::Client client;
 
   client.Connect(server_ip, port);
+
   auto public_key = client.RequestServerPublicKey();
   crypto::Crypto crypto(public_key);
 
   auto encrypted_file_path = crypto.EncryptFile(file_path);
-  client.SendFile({encrypted_file_path.filename(), fs::file_size(encrypted_file_path), {encrypted_file_path, std::ios::binary}});
+
+  client.SendFile({encrypted_file_path.filename(), fs::file_size(encrypted_file_path),
+                   {encrypted_file_path, std::ios::binary}});
 }
 
-std::filesystem::path Application:: Listen(unsigned int port, const std::string& public_rsa_key, const std::string& private_rsa_key) {
-  network::Server server(port);
+void Application::Listen(unsigned int port,
+                         const std::string &public_rsa_key,
+                         const std::string &private_rsa_key) {
+  network::Server server;
   crypto::Crypto crypto(public_rsa_key, private_rsa_key);
 
-  server.Start();
+  server.Start(port);
 
   auto public_key = crypto.getPublicKeyAsPEM();
   server.SendPublicKey(public_key);
 
   auto encrypted_file_path = server.DownloadFile();
   std::string decrypted_file_name = crypto.DecryptFile(encrypted_file_path);
-
-  return fs::current_path();
 }
 
 } // namespace app

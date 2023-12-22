@@ -2,12 +2,12 @@
 
 namespace network {
 
-void Server::Start() {
+void Server::Start(unsigned int port) {
   boost::system::error_code ec;
 
   std::cout << "Waiting for connection"sv << std::endl;
 
-  tcp::acceptor acceptor(io_context_, tcp::endpoint(tcp::v4(), port_));
+  tcp::acceptor acceptor(io_context_, tcp::endpoint(tcp::v4(), port));
   acceptor.accept(socket_, ec);
 
   if (ec) {
@@ -17,12 +17,10 @@ void Server::Start() {
   std::cout << ReadFromSocket();
 }
 
-void Server::SendPublicKey(const std::string& public_key) {
+void Server::SendPublicKey(const std::string &public_key) {
   boost::system::error_code ec;
-  std::cout << "2 " << public_key << std::endl;
   socket_.write_some(net::buffer(public_key + "\n"), ec);
 
-  std::cout << "3 " << std::endl;
   if (ec) {
     throw std::runtime_error("Error while sending public key");
   }
@@ -40,7 +38,7 @@ fs::path Server::DownloadFile() {
   auto path = fs::current_path().c_str() + "/"s + file_name;
   std::ofstream output_file_stream(path, std::ios::binary);
 
-  if(!output_file_stream){
+  if (!output_file_stream) {
     throw std::runtime_error("Can't create file");
   }
 
@@ -49,25 +47,25 @@ fs::path Server::DownloadFile() {
   size_t bytes_amount = 0;
   net::streambuf buffer;
 
-  if(buffer.size()){
+  if (buffer.size()) {
     bytes_amount += buffer.size();
     output_file_stream << &buffer;
   }
 
-  while(bytes_amount < file_size){
+  while (bytes_amount < file_size) {
     bytes_amount += boost::asio::read(socket_, buffer, boost::asio::transfer_at_least(1));
     output_file_stream << &buffer;
   }
 
   std::cout << "Download complete" << std::endl;
-  std::cout << "Received bytes: " << bytes_amount  << std::endl;
+  std::cout << "Received bytes: " << bytes_amount << std::endl;
 
   socket_.write_some(net::buffer("Success\n"));
 
   return path;
 }
 
-std::pair<std::string, uint64_t> Server::GetNameAndSize(const std::string& input) {
+std::pair<std::string, uint64_t> Server::GetNameAndSize(const std::string &input) {
   boost::smatch matches;
   boost::regex pattern(R"(FileName\(([^)]+)\);\sFileSize\((\d+)\))");
 
