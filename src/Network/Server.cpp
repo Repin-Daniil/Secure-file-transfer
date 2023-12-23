@@ -5,8 +5,7 @@ namespace network {
 void Server::Start(unsigned int port) {
   boost::system::error_code ec;
 
-  std::filesystem::path tmp_path = std::filesystem::current_path() / "tmp";
-  std::filesystem::create_directory(tmp_path);
+  std::filesystem::create_directory(std::filesystem::current_path().c_str() + "/tmp"s);
 
   std::cout << "Waiting for connection"sv << std::endl;
 
@@ -27,6 +26,8 @@ void Server::SendPublicKey(const std::string &public_key) {
   if (ec) {
     throw std::runtime_error("Error while sending public key");
   }
+
+  std::cout << "Send public key" << std::endl;
 }
 
 fs::path Server::DownloadFile() {
@@ -58,7 +59,6 @@ fs::path Server::DownloadFile() {
   while (bytes_amount < file_size) {
     bytes_amount += boost::asio::read(socket_, buffer, boost::asio::transfer_at_least(1));
     output_file_stream << &buffer;
-    std::cout << bytes_amount << std::endl;
   }
 
   std::cout << "Download complete" << std::endl;
@@ -72,15 +72,10 @@ fs::path Server::DownloadFile() {
 std::pair<std::string, uint64_t> Server::GetNameAndSize(const std::string &input) {
   boost::smatch matches;
   boost::regex pattern(R"(FileName\(([^)]+)\);\sFileSize\((\d+)\))");
-try {
-  if (boost::regex_search(input, matches, pattern)) {
-    std::cout << matches[2].str() << std::endl;
-    return std::pair(matches[1], std::stoll(matches[2].str()));
-  }} catch(std::exception &e) {
-  std::cout << "lololo " << e.what() << std::endl;
-  std::cout << "input " << input << std::endl;
 
-}
+  if (boost::regex_search(input, matches, pattern)) {
+    return std::pair(matches[1], std::stoll(matches[2].str()));
+  }
 
   throw std::runtime_error("Error, Wrong Format!");
 }

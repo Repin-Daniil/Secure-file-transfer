@@ -1,9 +1,10 @@
 #pragma once
 
-#include <string>
 #include <boost/asio.hpp>
+#include <string>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 namespace network {
 
@@ -20,7 +21,6 @@ struct Package {
 
 class Client {
  public:
-  // Methods
   void Connect(std::string_view ip_address, unsigned int port);
   std::string RequestServerPublicKey();
   void SendFile(Package package);
@@ -30,7 +30,7 @@ class Client {
   tcp::socket socket_{io_context_};
 
   // Methods
-  std::string Read();
+  std::string ReadFromSocket();
 };
 
 } // namespace network

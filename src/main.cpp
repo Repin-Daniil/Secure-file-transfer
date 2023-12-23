@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
       app.Send(argv[2], static_cast<unsigned int>(*argv[3]), argv[4]);
     } else {
       std::cout << "Usage: "sv << argv[0] << " server <port>, <RSA-pubkey-path>, <RSA-private-key-path>"sv << std::endl;
-      std::cout << "Usage: "sv << argv[0] << " client <server IP>, <server port>, <file path>" << std::endl;
+      std::cout << "Usage: "sv << argv[0] << " client <server IP>, <server port>, <file path>"sv << std::endl;
 
       return 1;
     }

@@ -1,5 +1,3 @@
-#include <cstring>
-
 #include "Crypto.h"
 
 namespace crypto {
@@ -161,7 +159,8 @@ std::vector<unsigned char> Crypto::DecryptWithPrivateKey(const std::vector<unsig
 
   while (data_offset < data_size) {
     std::vector<unsigned char>
-        chunk_to_decrypt(encrypted_data.begin() + data_offset, encrypted_data.begin() + data_offset + encrypted_block_size);
+        chunk_to_decrypt
+        (encrypted_data.begin() + data_offset, encrypted_data.begin() + data_offset + encrypted_block_size);
     std::vector<unsigned char> decrypted_chunk = DecryptDataBlock(chunk_to_decrypt);
     decrypted_data.insert(decrypted_data.end(), decrypted_chunk.begin(), decrypted_chunk.end());
     data_offset += encrypted_block_size;
@@ -214,7 +213,7 @@ Crypto::~Crypto() {
 std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
   std::cout << "Encrypting..." << std::endl;
 
-  if(!std::filesystem::exists(file_path)) {
+  if (!std::filesystem::exists(file_path)) {
     throw std::runtime_error("Error: File not found");
   }
 
@@ -262,7 +261,9 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
     throw std::runtime_error("Error: Unable to open combined input file");
   }
 
-  std::filesystem::path output_file_path = std::filesystem::current_path() / (file_path.filename().string().erase(file_path.filename().string().find("encrypted_"), std::strlen("encrypted_")));
+  std::filesystem::path output_file_path = std::filesystem::current_path() / (file_path.filename().string().erase(
+      file_path.filename().string().find("encrypted_"),
+      std::strlen("encrypted_")));
 
   std::ofstream output_file(output_file_path, std::ios::binary);
   if (!output_file.is_open()) {
@@ -287,6 +288,4 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
   return output_file_path.string();
 }
 
-
 } // namespace crypto
-

@@ -1,5 +1,12 @@
 #pragma once
+
 #include <filesystem>
+#include <string_view>
+#include <iostream>
+
+#include "../Network/Server.h"
+#include "../Network/Client.h"
+#include "../Crypto/Crypto.h"
 
 namespace app {
 

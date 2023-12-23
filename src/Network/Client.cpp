@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Client.h"
 
 namespace network {
@@ -29,7 +28,7 @@ std::string Client::RequestServerPublicKey() {
     throw std::runtime_error("Error sending request for public key");
   }
 
-  auto public_key = Read();
+  auto public_key = ReadFromSocket();
   std::cout << "Get Public Key from server" << std::endl;
 
   return public_key;
@@ -69,10 +68,10 @@ void Client::SendFile(Package package) {
             << "Bytes sent: " << bytes_sent << std::endl;
 
   std::cout << "Waiting for server's response" << std::endl;
-  std::cout << Read();
+  std::cout << ReadFromSocket();
 }
 
-std::string Client::Read() {
+std::string Client::ReadFromSocket() {
   boost::system::error_code ec;
 
   net::streambuf stream_buf;
