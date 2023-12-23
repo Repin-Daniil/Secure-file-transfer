@@ -1,4 +1,5 @@
 #include <cstring>
+
 #include "Crypto.h"
 
 namespace crypto {
@@ -17,6 +18,7 @@ std::string Crypto::GetPublicKeyAsString() {
 
 RSA *Crypto::CreatePublicKeyFromString(const std::string &pemString) {
   BIO *bio = BIO_new_mem_buf(pemString.c_str(), pemString.size());
+
   if (bio == NULL) {
     std::cerr << "Failed to create mem BIO" << std::endl;
     return nullptr;
@@ -28,51 +30,57 @@ RSA *Crypto::CreatePublicKeyFromString(const std::string &pemString) {
   }
 
   BIO_free(bio);
+
   return rsa;
 }
 
 RSA *Crypto::ReadPublicKeyFromPEM(const std::string &publicKeyFilePath) {
-  FILE *publicKeyFile = fopen(publicKeyFilePath.c_str(), "r");
-  if (!publicKeyFile) {
+  FILE *public_key_file = fopen(publicKeyFilePath.c_str(), "r");
+
+  if (!public_key_file) {
     std::cerr << "Failed to open public key file" << std::endl;
     return nullptr;
   }
 
-  RSA *rsa = PEM_read_RSA_PUBKEY(publicKeyFile, NULL, NULL, NULL);
+  RSA *rsa = PEM_read_RSA_PUBKEY(public_key_file, NULL, NULL, NULL);
 
   if (!rsa) {
     std::cerr << "Failed to read public key from PEM file" << std::endl;
-    fclose(publicKeyFile);
+    fclose(public_key_file);
     return nullptr;
   }
 
-  fclose(publicKeyFile);
+  fclose(public_key_file);
 
   return rsa;
 }
 
 RSA *Crypto::ReadPrivateKeyFromPEM(const std::string &privateKeyFilePath) {
-  FILE *privateKeyFile = fopen(privateKeyFilePath.c_str(), "r");
-  if (!privateKeyFile) {
+  FILE *private_key_file = fopen(privateKeyFilePath.c_str(), "r");
+
+  if (!private_key_file) {
     std::cerr << "Failed to open private key file" << std::endl;
     return nullptr;
   }
 
-  RSA *rsa = PEM_read_RSAPrivateKey(privateKeyFile, NULL, NULL, NULL);
+  RSA *rsa = PEM_read_RSAPrivateKey(private_key_file, NULL, NULL, NULL);
+
   if (!rsa) {
     std::cerr << "Failed to read private key from PEM file" << std::endl;
-    fclose(privateKeyFile);
+    fclose(private_key_file);
     return nullptr;
   }
 
-  fclose(privateKeyFile);
+  fclose(private_key_file);
+
   return rsa;
 }
 
 std::vector<unsigned char> Crypto::ReadFileBytes(const std::string &filePath) {
   std::ifstream file(filePath, std::ios::binary);
-  std::vector<unsigned char> fileData((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
-  return fileData;
+  std::vector<unsigned char> file_data((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
+
+  return file_data;
 }
 
 void Crypto::WriteFileBytes(const std::string &filePath, const std::vector<unsigned char> &fileBytes) {
@@ -81,85 +89,96 @@ void Crypto::WriteFileBytes(const std::string &filePath, const std::vector<unsig
 }
 
 std::vector<unsigned char> Crypto::PerformEncryption(RSA *publicKey, const std::vector<unsigned char> &data) {
-  int inputBlockSize = RSA_size(publicKey) - 42;
-  std::vector<unsigned char> encryptedData(RSA_size(publicKey));
-  int totalEncryptedLength = 0;
-  int dataOffset = 0;
-  while (dataOffset < data.size()) {
-    int remainingData = data.size() - dataOffset;
-    int blockSize = (remainingData > inputBlockSize) ? inputBlockSize : remainingData;
-    int encryptedLength = RSA_public_encrypt(blockSize,
-                                             &data[dataOffset],
-                                             &encryptedData[totalEncryptedLength],
-                                             publicKey,
-                                             RSA_PKCS1_PADDING);
-    if (encryptedLength == -1) {
+  int input_block_size = RSA_size(publicKey) - 42;
+
+  std::vector<unsigned char> encrypted_data(RSA_size(publicKey));
+
+  int total_encrypted_length = 0;
+  int data_offset = 0;
+
+  while (data_offset < data.size()) {
+    int remaining_data = data.size() - data_offset;
+    int block_size = (remaining_data > input_block_size) ? input_block_size : remaining_data;
+    int encrypted_length = RSA_public_encrypt(block_size,
+                                              &data[data_offset],
+                                              &encrypted_data[total_encrypted_length],
+                                              publicKey,
+                                              RSA_PKCS1_PADDING);
+
+    if (encrypted_length == -1) {
       std::cerr << "Failed to encrypt data" << std::endl;
       return {};
     }
-    totalEncryptedLength += encryptedLength;
-    dataOffset += blockSize;
+
+    total_encrypted_length += encrypted_length;
+    data_offset += block_size;
   }
-  encryptedData.resize(totalEncryptedLength);
-  return encryptedData;
+
+  encrypted_data.resize(total_encrypted_length);
+
+  return encrypted_data;
 }
 
-std::vector<unsigned char> Crypto::PerformDecryption(RSA *privateKey, const std::vector<unsigned char> &encryptedData) {
-  int encryptedBlockSize = RSA_size(privateKey);
-  std::vector<unsigned char> decryptedData(RSA_size(privateKey));
-  int totalDecryptedLength = 0;
-  int dataOffset = 0;
-  while (dataOffset < encryptedData.size()) {
-    int decryptedLength = RSA_private_decrypt(encryptedBlockSize,
-                                              &encryptedData[dataOffset],
-                                              &decryptedData[totalDecryptedLength],
-                                              privateKey,
-                                              RSA_PKCS1_PADDING);
-    if (decryptedLength == -1) {
+std::vector<unsigned char> Crypto::PerformDecryption(RSA *privateKey, const std::vector<unsigned char> &encrypted_data) {
+  int encrypted_block_size = RSA_size(privateKey);
+  std::vector<unsigned char> decrypted_data(RSA_size(privateKey));
+  int total_decrypted_length = 0;
+  int data_offset = 0;
+
+  while (data_offset < encrypted_data.size()) {
+    int decrypted_length = RSA_private_decrypt(encrypted_block_size,
+                                               &encrypted_data[data_offset],
+                                               &decrypted_data[total_decrypted_length],
+                                               privateKey,
+                                               RSA_PKCS1_PADDING);
+    if (decrypted_length == -1) {
       std::cerr << "Failed to decrypt data" << std::endl;
       return {};
     }
-    totalDecryptedLength += decryptedLength;
-    dataOffset += encryptedBlockSize;
+
+    total_decrypted_length += decrypted_length;
+    data_offset += encrypted_block_size;
   }
-  decryptedData.resize(totalDecryptedLength);
-  return decryptedData;
+
+  decrypted_data.resize(total_decrypted_length);
+
+  return decrypted_data;
 }
 
 std::vector<unsigned char> Crypto::EncryptWithPublicKey(RSA *publicKey, const std::vector<unsigned char> &data) {
+  int input_block_size = RSA_size(publicKey) - 42;
+  std::vector<unsigned char> encrypted_data;
+  int data_size = data.size();
+  int data_offset = 0;
 
-  int inputBlockSize = RSA_size(publicKey) - 42;
-  std::vector<unsigned char> encryptedData;
-  int dataSize = data.size();
-  int dataOffset = 0;
+  while (data_offset < data_size) {
+    int block_size = (data_size - data_offset > input_block_size) ? input_block_size : data_size - data_offset;
 
-  while (dataOffset < dataSize) {
-    int blockSize = (dataSize - dataOffset > inputBlockSize) ? inputBlockSize : dataSize - dataOffset;
-    std::vector<unsigned char> chunkToEncrypt(data.begin() + dataOffset, data.begin() + dataOffset + blockSize);
-    std::vector<unsigned char> encryptedChunk = PerformEncryption(publicKey, chunkToEncrypt);
-    encryptedData.insert(encryptedData.end(), encryptedChunk.begin(), encryptedChunk.end());
-    dataOffset += blockSize;
+    std::vector<unsigned char> chunk_to_encrypt(data.begin() + data_offset, data.begin() + data_offset + block_size);
+    std::vector<unsigned char> encrypted_chunk = PerformEncryption(publicKey, chunk_to_encrypt);
+    encrypted_data.insert(encrypted_data.end(), encrypted_chunk.begin(), encrypted_chunk.end());
+    data_offset += block_size;
   }
 
-  return encryptedData;
+  return encrypted_data;
 }
 
 std::vector<unsigned char> Crypto::DecryptWithPrivateKey(RSA *privateKey,
-                                                         const std::vector<unsigned char> &encryptedData) {
-  int encryptedBlockSize = RSA_size(privateKey);
-  std::vector<unsigned char> decryptedData;
-  int dataSize = encryptedData.size();
-  int dataOffset = 0;
+                                                         const std::vector<unsigned char> &encrypted_data) {
+  int encrypted_block_size = RSA_size(privateKey);
+  std::vector<unsigned char> decrypted_data;
+  int data_size = encrypted_data.size();
+  int data_offset = 0;
 
-  while (dataOffset < dataSize) {
+  while (data_offset < data_size) {
     std::vector<unsigned char>
-        chunkToDecrypt(encryptedData.begin() + dataOffset, encryptedData.begin() + dataOffset + encryptedBlockSize);
-    std::vector<unsigned char> decryptedChunk = PerformDecryption(privateKey, chunkToDecrypt);
-    decryptedData.insert(decryptedData.end(), decryptedChunk.begin(), decryptedChunk.end());
-    dataOffset += encryptedBlockSize;
+        chunk_to_decrypt(encrypted_data.begin() + data_offset, encrypted_data.begin() + data_offset + encrypted_block_size);
+    std::vector<unsigned char> decrypted_chunk = PerformDecryption(privateKey, chunk_to_decrypt);
+    decrypted_data.insert(decrypted_data.end(), decrypted_chunk.begin(), decrypted_chunk.end());
+    data_offset += encrypted_block_size;
   }
 
-  return decryptedData;
+  return decrypted_data;
 }
 
 Crypto::Crypto(std::string public_key) {
@@ -178,15 +197,19 @@ Crypto::Crypto(std::string public_key_path, std::string private_key_path) {
   } catch (std::exception &e) {
     std::cout << "Error during reading public key from PEM - " << e.what() << std::endl;
   }
+
   keys_.first = true;
+
   try {
     private_key_ = Crypto::ReadPrivateKeyFromPEM(private_key_path);
   } catch (std::exception &e) {
     std::cout << "Error during reading private key from PEM - " << e.what() << std::endl;
+
     if (keys_.first) {
       RSA_free(public_key_);
     }
   }
+
   keys_.second = true;
 }
 
@@ -204,43 +227,68 @@ std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
     throw std::runtime_error("Error: File not found");
   }
 
-  std::ifstream fileStream(file_path, std::ios::binary | std::ios::ate);
-  if (!fileStream.is_open()) {
+  std::ifstream file_stream(file_path, std::ios::binary);
+  if (!file_stream.is_open()) {
     throw std::runtime_error("Error: Unable to open file");
   }
-  std::streamsize fileSize = fileStream.tellg();
-  fileStream.seekg(0, std::ios::beg);
 
-  std::vector<unsigned char> fileData(fileSize);
-  if(!fileStream.read(reinterpret_cast<char*>(fileData.data()), fileSize)) {
-    throw std::runtime_error("Error: Unable to read file");
+  std::filesystem::path output_dir = std::filesystem::temp_directory_path();
+  std::filesystem::path output_file_path = output_dir / ("encrypted_" + file_path.filename().string());
+
+  std::ofstream combined_output_file(output_file_path, std::ios::binary);
+  if (!combined_output_file.is_open()) {
+    throw std::runtime_error("Error: Unable to create combined output file");
   }
 
-  std::vector<unsigned char> encryptedFileData = EncryptWithPublicKey(public_key_, fileData);
+  std::streamsize block_size = 10000;
+  std::vector<unsigned char> buffer(block_size);
 
-  std::filesystem::path tmp_path = std::filesystem::current_path() / "tmp";
-  std::filesystem::create_directory(tmp_path);
+  while (!file_stream.eof()) {
+    file_stream.read(reinterpret_cast<char *>(buffer.data()), block_size);
+    auto bytes_read = file_stream.gcount();
+    if (bytes_read > 0) {
+      std::vector<unsigned char> data(buffer.begin(), buffer.begin() + bytes_read);
+      std::vector<unsigned char> encrypted_data = EncryptWithPublicKey(public_key_, data);
+      combined_output_file.write(reinterpret_cast<const char *>(encrypted_data.data()), encrypted_data.size());
+    }
+  }
 
-  std::filesystem::path encrypted_file_path = tmp_path / ("encrypted_" + file_path.filename().string());
-
-  WriteFileBytes(encrypted_file_path.string(), encryptedFileData);
-
-  return encrypted_file_path;
+  return output_file_path;
 }
 
 std::string Crypto::DecryptFile(std::filesystem::path file_path) {
-  std::string outputExtension = std::filesystem::path(file_path).extension();
+  if (!std::filesystem::exists(file_path)) {
+    throw std::runtime_error("Error: File not found");
+  }
 
-  std::vector<unsigned char> encryptedFileDataFromFile = Crypto::ReadFileBytes(file_path);
-  std::vector<unsigned char> decryptedData = Crypto::DecryptWithPrivateKey(private_key_, encryptedFileDataFromFile);
-  std::string decryptedFileName = std::filesystem::path(file_path).string();
-  decryptedFileName = decryptedFileName.erase(decryptedFileName.find("encrypted_"), std::strlen("encrypted_"));
-  decryptedFileName = std::filesystem::path(decryptedFileName).stem().string() + outputExtension;
+  std::ifstream combined_input_file(file_path, std::ios::binary);
+  if (!combined_input_file.is_open()) {
+    throw std::runtime_error("Error: Unable to open combined input file");
+  }
 
-  Crypto::WriteFileBytes(decryptedFileName, decryptedData);
+  std::filesystem::path output_file_path = std::filesystem::current_path() / ("2_" + file_path.filename().string());
 
-  return decryptedFileName;
+  std::ofstream output_file(output_file_path, std::ios::binary);
+  if (!output_file.is_open()) {
+    throw std::runtime_error("Error: Unable to create output file");
+  }
+
+  std::streamsize block_size = 10000;
+  std::vector<unsigned char> buffer(block_size);
+
+  while (!combined_input_file.eof()) {
+    combined_input_file.read(reinterpret_cast<char *>(buffer.data()), block_size);
+    auto bytes_read = combined_input_file.gcount();
+    if (bytes_read > 0) {
+      std::vector<unsigned char> encrypted_data(buffer.begin(), buffer.begin() + bytes_read);
+      std::vector<unsigned char> decrypted_data = DecryptWithPrivateKey(private_key_, encrypted_data);
+      output_file.write(reinterpret_cast<const char *>(decrypted_data.data()), decrypted_data.size());
+    }
+  }
+
+  return output_file_path.string();
 }
+
 
 } // namespace crypto
 

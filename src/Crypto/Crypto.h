@@ -31,9 +31,9 @@ class Crypto {
   std::vector<unsigned char> ReadFileBytes(const std::string &filePath);
   void WriteFileBytes(const std::string &filePath, const std::vector<unsigned char> &fileBytes);
   std::vector<unsigned char> PerformEncryption(RSA *publicKey, const std::vector<unsigned char> &data);
-  std::vector<unsigned char> PerformDecryption(RSA *privateKey, const std::vector<unsigned char> &encryptedData);
+  std::vector<unsigned char> PerformDecryption(RSA *privateKey, const std::vector<unsigned char> &encrypted_data);
   std::vector<unsigned char> EncryptWithPublicKey(RSA *publicKey, const std::vector<unsigned char> &data);
-  std::vector<unsigned char> DecryptWithPrivateKey(RSA *privateKey, const std::vector<unsigned char> &encryptedData);
+  std::vector<unsigned char> DecryptWithPrivateKey(RSA *privateKey, const std::vector<unsigned char> &encrypted_data);
 };
 
 } // namespace crypto

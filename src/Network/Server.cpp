@@ -32,7 +32,7 @@ void Server::SendPublicKey(const std::string &public_key) {
 fs::path Server::DownloadFile() {
   auto file_data = GetNameAndSize(ReadFromSocket());
 
-  std::string file_name = file_data.first;
+  std::string file_name = "2_"s + file_data.first;
   uint64_t file_size = file_data.second;
 
   std::cout << "File name: " << file_name << std::endl;
@@ -58,6 +58,7 @@ fs::path Server::DownloadFile() {
   while (bytes_amount < file_size) {
     bytes_amount += boost::asio::read(socket_, buffer, boost::asio::transfer_at_least(1));
     output_file_stream << &buffer;
+    std::cout << bytes_amount << std::endl;
   }
 
   std::cout << "Download complete" << std::endl;
@@ -71,10 +72,15 @@ fs::path Server::DownloadFile() {
 std::pair<std::string, uint64_t> Server::GetNameAndSize(const std::string &input) {
   boost::smatch matches;
   boost::regex pattern(R"(FileName\(([^)]+)\);\sFileSize\((\d+)\))");
-
+try {
   if (boost::regex_search(input, matches, pattern)) {
-    return std::pair(matches[1], std::stoi(matches[2].str()));
-  }
+    std::cout << matches[2].str() << std::endl;
+    return std::pair(matches[1], std::stoll(matches[2].str()));
+  }} catch(std::exception &e) {
+  std::cout << "lololo " << e.what() << std::endl;
+  std::cout << "input " << input << std::endl;
+
+}
 
   throw std::runtime_error("Error, Wrong Format!");
 }
