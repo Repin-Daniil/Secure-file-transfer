@@ -78,10 +78,10 @@ RSA *Crypto::ReadPrivateKeyFromPEM(const std::string &private_key_file_path) {
   return rsa;
 }
 
-std::vector<unsigned char> Crypto::PerformEncryption(RSA *public_key, const std::vector<unsigned char> &data) {
-  int input_block_size = RSA_size(public_key) - 42;
+std::vector<unsigned char> Crypto::EncryptDataBlock(const std::vector<unsigned char> &data) {
+  int input_block_size = RSA_size(public_key_) - 42;
 
-  std::vector<unsigned char> encrypted_data(RSA_size(public_key));
+  std::vector<unsigned char> encrypted_data(RSA_size(public_key_));
 
   int total_encrypted_length = 0;
   int data_offset = 0;
@@ -92,7 +92,7 @@ std::vector<unsigned char> Crypto::PerformEncryption(RSA *public_key, const std:
     int encrypted_length = RSA_public_encrypt(block_size,
                                               &data[data_offset],
                                               &encrypted_data[total_encrypted_length],
-                                              public_key,
+                                              public_key_,
                                               RSA_PKCS1_PADDING);
 
     if (encrypted_length == -1) {
@@ -109,9 +109,9 @@ std::vector<unsigned char> Crypto::PerformEncryption(RSA *public_key, const std:
   return encrypted_data;
 }
 
-std::vector<unsigned char> Crypto::PerformDecryption(RSA *private_key, const std::vector<unsigned char> &encrypted_data) {
-  int encrypted_block_size = RSA_size(private_key);
-  std::vector<unsigned char> decrypted_data(RSA_size(private_key));
+std::vector<unsigned char> Crypto::DecryptDataBlock(const std::vector<unsigned char> &encrypted_data) {
+  int encrypted_block_size = RSA_size(private_key_);
+  std::vector<unsigned char> decrypted_data(RSA_size(private_key_));
   int total_decrypted_length = 0;
   int data_offset = 0;
 
@@ -119,7 +119,7 @@ std::vector<unsigned char> Crypto::PerformDecryption(RSA *private_key, const std
     int decrypted_length = RSA_private_decrypt(encrypted_block_size,
                                                &encrypted_data[data_offset],
                                                &decrypted_data[total_decrypted_length],
-                                               private_key,
+                                               private_key_,
                                                RSA_PKCS1_PADDING);
     if (decrypted_length == -1) {
       std::cerr << "Failed to decrypt data" << std::endl;
@@ -135,8 +135,8 @@ std::vector<unsigned char> Crypto::PerformDecryption(RSA *private_key, const std
   return decrypted_data;
 }
 
-std::vector<unsigned char> Crypto::EncryptWithPublicKey(RSA *public_key, const std::vector<unsigned char> &data) {
-  int input_block_size = RSA_size(public_key) - 42;
+std::vector<unsigned char> Crypto::EncryptWithPublicKey(const std::vector<unsigned char> &data) {
+  int input_block_size = RSA_size(public_key_) - 42;
   std::vector<unsigned char> encrypted_data;
   int data_size = data.size();
   int data_offset = 0;
@@ -145,7 +145,7 @@ std::vector<unsigned char> Crypto::EncryptWithPublicKey(RSA *public_key, const s
     int block_size = (data_size - data_offset > input_block_size) ? input_block_size : data_size - data_offset;
 
     std::vector<unsigned char> chunk_to_encrypt(data.begin() + data_offset, data.begin() + data_offset + block_size);
-    std::vector<unsigned char> encrypted_chunk = PerformEncryption(public_key, chunk_to_encrypt);
+    std::vector<unsigned char> encrypted_chunk = EncryptDataBlock(chunk_to_encrypt);
     encrypted_data.insert(encrypted_data.end(), encrypted_chunk.begin(), encrypted_chunk.end());
     data_offset += block_size;
   }
@@ -153,9 +153,8 @@ std::vector<unsigned char> Crypto::EncryptWithPublicKey(RSA *public_key, const s
   return encrypted_data;
 }
 
-std::vector<unsigned char> Crypto::DecryptWithPrivateKey(RSA *private_key,
-                                                         const std::vector<unsigned char> &encrypted_data) {
-  int encrypted_block_size = RSA_size(private_key);
+std::vector<unsigned char> Crypto::DecryptWithPrivateKey(const std::vector<unsigned char> &encrypted_data) {
+  int encrypted_block_size = RSA_size(private_key_);
   std::vector<unsigned char> decrypted_data;
   int data_size = encrypted_data.size();
   int data_offset = 0;
@@ -163,7 +162,7 @@ std::vector<unsigned char> Crypto::DecryptWithPrivateKey(RSA *private_key,
   while (data_offset < data_size) {
     std::vector<unsigned char>
         chunk_to_decrypt(encrypted_data.begin() + data_offset, encrypted_data.begin() + data_offset + encrypted_block_size);
-    std::vector<unsigned char> decrypted_chunk = PerformDecryption(private_key, chunk_to_decrypt);
+    std::vector<unsigned char> decrypted_chunk = DecryptDataBlock(chunk_to_decrypt);
     decrypted_data.insert(decrypted_data.end(), decrypted_chunk.begin(), decrypted_chunk.end());
     data_offset += encrypted_block_size;
   }
@@ -241,7 +240,7 @@ std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
     auto bytes_read = file_stream.gcount();
     if (bytes_read > 0) {
       std::vector<unsigned char> data(buffer.begin(), buffer.begin() + bytes_read);
-      std::vector<unsigned char> encrypted_data = EncryptWithPublicKey(public_key_, data);
+      std::vector<unsigned char> encrypted_data = EncryptWithPublicKey(data);
       combined_output_file.write(reinterpret_cast<const char *>(encrypted_data.data()), encrypted_data.size());
     }
   }
@@ -278,7 +277,7 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
     auto bytes_read = combined_input_file.gcount();
     if (bytes_read > 0) {
       std::vector<unsigned char> encrypted_data(buffer.begin(), buffer.begin() + bytes_read);
-      std::vector<unsigned char> decrypted_data = DecryptWithPrivateKey(private_key_, encrypted_data);
+      std::vector<unsigned char> decrypted_data = DecryptWithPrivateKey(encrypted_data);
       output_file.write(reinterpret_cast<const char *>(decrypted_data.data()), decrypted_data.size());
     }
   }
