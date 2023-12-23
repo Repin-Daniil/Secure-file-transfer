@@ -37,4 +37,3 @@ class Crypto {
 };
 
 } // namespace crypto
-

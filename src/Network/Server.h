@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -11,7 +12,6 @@ namespace net = boost::asio;
 namespace fs = std::filesystem;
 
 using net::ip::tcp;
-using namespace fs;
 using namespace std::literals;
 
 class Server {

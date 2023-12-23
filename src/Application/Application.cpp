@@ -2,9 +2,6 @@
 
 namespace app {
 
-namespace fs = std::filesystem;
-using namespace fs;
-
 void Application::Send(std::string_view server_ip,
                        unsigned int port,
                        std::filesystem::path file_path) {

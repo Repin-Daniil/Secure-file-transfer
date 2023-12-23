@@ -34,4 +34,7 @@ cmake --build cmake-build-debug --target safe_tunnel
 ```
 
 ### Архитектура
-![](res/Safe-tunnel.drawio.png)
+![](res/UML.png)
+
+### Алгоритм
+![](res/Algo.png)
