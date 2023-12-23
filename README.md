@@ -33,3 +33,5 @@ cmake --build cmake-build-debug --target safe_tunnel
 ./cmake-build-debug/bin/safe_tunnel client 127.0.0.1  3333 .gitignore
 ```
 
+### Архитектура
+![](res/Safe-tunnel.drawio.png)
