@@ -240,7 +240,7 @@ std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
     throw std::runtime_error("Error: Unable to create combined output file");
   }
 
-  std::streamsize block_size = 10000;
+  std::streamsize block_size = 20480;
   std::vector<unsigned char> buffer(block_size);
 
   while (!file_stream.eof()) {
@@ -266,14 +266,14 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
     throw std::runtime_error("Error: Unable to open combined input file");
   }
 
-  std::filesystem::path output_file_path = std::filesystem::current_path() / ("2_" + file_path.filename().string());
+  std::filesystem::path output_file_path = std::filesystem::current_path() / (file_path.filename().string().erase(file_path.filename().string().find("encrypted_"), std::strlen("encrypted_")));
 
   std::ofstream output_file(output_file_path, std::ios::binary);
   if (!output_file.is_open()) {
     throw std::runtime_error("Error: Unable to create output file");
   }
 
-  std::streamsize block_size = 10000;
+  std::streamsize block_size = 20480;
   std::vector<unsigned char> buffer(block_size);
 
   while (!combined_input_file.eof()) {

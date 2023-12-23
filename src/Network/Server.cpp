@@ -32,7 +32,7 @@ void Server::SendPublicKey(const std::string &public_key) {
 fs::path Server::DownloadFile() {
   auto file_data = GetNameAndSize(ReadFromSocket());
 
-  std::string file_name = "2_"s + file_data.first;
+  std::string file_name = file_data.first;
   uint64_t file_size = file_data.second;
 
   std::cout << "File name: " << file_name << std::endl;
