@@ -5,7 +5,7 @@
 cd cmake-build-debug
 conan install .. --build=missing
 ```
-### Создание ключей (для клиента)
+### Создание ключей (для сервера)
 ```shell
 openssl genrsa -out private_key.pem 1024
 openssl rsa -in private_key.pem -outform PEM -pubout -out public_key.pem
