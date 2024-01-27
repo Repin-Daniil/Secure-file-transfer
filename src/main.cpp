@@ -1,13 +1,11 @@
 #include <iostream>
-#include <memory>
-#include <condition_variable>
 
 #include "Application/Application.h"
 #include "util/command_line_parser.h"
 
 using namespace std::literals;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 
   //TODO Добавить JSON конфиг
   //TODO Душа требует нормального логирования

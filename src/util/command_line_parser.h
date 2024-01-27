@@ -11,27 +11,27 @@
 
 #include "../constants_storage.h"
 
-using namespace std::literals;
+namespace util {
 
 namespace fs = std::filesystem;
 
-namespace util {
+using namespace std::literals;
 
 enum Mode { None, Client, Server };
 
 struct Config {
-  Config(Mode mode_1) : mode(mode_1) {}
+  Config(Mode user_choice) : mode(user_choice) {}
   virtual ~Config()= default;
 
   Mode mode;
 };
 
 struct ServerConfig : Config {
-  ServerConfig(unsigned int port, fs::path pub_key, fs::path private_key)
-      : Config(Server),
-        port(port),
-        public_key_path(pub_key),
-        private_key_path(private_key) {
+  ServerConfig(unsigned int listening_port, fs::path pub_key, fs::path private_key)
+      : Config(Mode::Server),
+        port(listening_port),
+        public_key_path(std::move(pub_key)),
+        private_key_path(std::move(private_key)) {
   }
 
   unsigned int port;
@@ -43,7 +43,7 @@ struct ClientConfig : Config {
   using Address = std::pair<std::string, unsigned int>;
 
   ClientConfig(std::vector<Address> addresses, std::vector<fs::path> packages)
-      : Config(Client),
+      : Config(Mode::Client),
         servers(std::move(addresses)),
         path_to_packages(std::move(packages)) {
   }
@@ -53,7 +53,7 @@ struct ClientConfig : Config {
 };
 
 struct NullConfig : Config {
-  NullConfig() : Config(None) {}
+  NullConfig() : Config(Mode::None) {}
 };
 
 //TODO Подгружать бы конфиг из JSON, тогда надо будет разделить на ConfigLoader, JsonLoader, CommandLineParser

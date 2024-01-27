@@ -1,7 +1,7 @@
 #include "test_framework_for_parser.h"
 
 char **MakeArgv(const std::vector<std::string> &args) {
-  size_t argc = args.size();
+  int argc = args.size();
   auto argv = new char *[argc];
 
   for (int i = 0; i < argc; ++i) {

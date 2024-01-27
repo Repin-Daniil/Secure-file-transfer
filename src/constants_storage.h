@@ -7,6 +7,8 @@ namespace constants {
 using namespace std::literals;
 
 struct ExceptionMessage {
+  ExceptionMessage() = delete;
+
   constexpr static std::string_view WRONG_SERVER_CONFIG = "Wrong configuration for server"sv;
   constexpr static std::string_view WRONG_CLIENT_CONFIG = "Wrong configuration for client"sv;
   constexpr static std::string_view OPTION_MODE_IS_MISSED = "Option mode is missed"sv;
@@ -18,6 +20,8 @@ struct ExceptionMessage {
 };
 
 struct ProgramOptions {
+  ProgramOptions() = delete;
+
   constexpr static std::string_view GENERAL_OPTIONS = "General options"sv;
   constexpr static std::string_view SERVER_OPTIONS = "Server options"sv;
   constexpr static std::string_view CLIENT_OPTIONS = "Client options"sv;
