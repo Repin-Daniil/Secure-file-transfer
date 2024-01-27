@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <boost/program_options.hpp>
+#include <boost/asio/ip/address.hpp>
 
 #include "../constants_storage.h"
 

@@ -17,23 +17,32 @@ endif ()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-add_executable(safe_tunnel src/main.cpp
+
+add_executable(safe_tunnel
+        src/main.cpp
+
+        src/constants_storage.h
         src/Application/Application.h
         src/Network/Server.h
         src/Network/Client.h
         src/Crypto/Crypto.h
+        src/util/command_line_parser.h
 
         src/Application/Application.cpp
         src/Network/Client.cpp
         src/Network/Server.cpp
         src/Crypto/Crypto.cpp
+        src/util/command_line_parser.cpp)
 
-        src/util/command_line_parser.h
-        src/util/command_line_parser.cpp src/constants_storage.h)
-
-target_link_libraries(safe_tunnel PRIVATE Threads::Threads
+target_link_libraries(safe_tunnel PRIVATE
+        Threads::Threads
         OpenSSL::SSL
-        OpenSSL::Crypto)
+        OpenSSL::Crypto
+        CONAN_PKG::boost)
 
-target_include_directories(safe_tunnel PRIVATE CONAN_PKG::boost)
-target_link_libraries(safe_tunnel PRIVATE CONAN_PKG::boost)
+# Tests
+enable_testing()
+add_executable(ParserTest
+        tests/CommandLineParser/client_config_tests.cpp src/util/command_line_parser.h src/util/command_line_parser.cpp tests/CommandLineParser/server_config_tests.cpp tests/CommandLineParser/test_framework_for_parser.cpp tests/CommandLineParser/test_framework_for_parser.h tests/CommandLineParser/general_tests.cpp)
+target_link_libraries(ParserTest PRIVATE CONAN_PKG::catch2  CONAN_PKG::boost )
+add_test(NAME PARSER_TEST COMMAND ParserTest)

@@ -67,6 +67,10 @@ std::unique_ptr<Config> CommandLineParser::ParseCommandLine(int argc, const char
       throw std::runtime_error(ExceptionMessage::WRONG_SERVER_CONFIG.data());
     }
 
+    if (args_.port < 0 || args_.port > 65535) {
+      throw std::runtime_error(constants::ExceptionMessage::NON_EXISTENT_PORT.data());
+    }
+
     config = std::make_unique<ServerConfig>(args_.port, args_.path_to_public_key, args_.path_to_private_key);
   } else if (args_.mode == ProgramOptions::MODE_CLIENT.data()) {
     desc.add(client_options_description);
@@ -90,13 +94,31 @@ std::unique_ptr<Config> CommandLineParser::ParseCommandLine(int argc, const char
 
 ClientConfig::Address CommandLineParser::ConvertStrToAddress(const std::string &str) {
   std::string delimiter = constants::ProgramOptions::ADDRESSES_DELIMITER.data();
-  size_t delimiter_pos = str.find(delimiter);
+  auto delimiter_pos = str.find(delimiter);
+
+  if (delimiter_pos == std::string::npos || delimiter_pos == 0) {
+    throw std::runtime_error(constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
+  }
 
   std::string ip = str.substr(0, delimiter_pos);
-  int port = std::stoi(str.substr(delimiter_pos + delimiter.size(), str.size() - delimiter_pos));
 
-  if (port < 0) {
-    throw std::runtime_error(constants::ExceptionMessage::NEGATIVE_PORT.data());
+  int port = -1;
+
+  try {
+    port = std::stoi(str.substr(delimiter_pos + delimiter.size(), str.size() - delimiter_pos));
+  } catch (...) {
+    throw std::runtime_error(constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
+  }
+
+  boost::system::error_code ec;
+  boost::asio::ip::make_address(ip, ec);
+
+  if (ec) {
+    throw std::runtime_error(constants::ExceptionMessage::NON_EXISTENT_IP.data());
+  }
+
+  if (port < 0 || port > 65535) {
+    throw std::runtime_error(constants::ExceptionMessage::NON_EXISTENT_PORT.data());
   }
 
   return {ip, port};
@@ -107,6 +129,10 @@ std::vector<fs::path> CommandLineParser::ParsePaths() {
 
   for (auto &path_str : args_.path_to_packages) {
     packages_path.emplace_back(path_str);
+  }
+
+  if (packages_path.empty()) {
+    throw std::runtime_error(constants::ExceptionMessage::NO_PACKAGES.data());
   }
 
   return std::move(packages_path);

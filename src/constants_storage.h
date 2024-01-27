@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string_view>
-#include <boost/json.hpp>
 
 namespace constants {
 
@@ -12,7 +11,10 @@ struct ExceptionMessage {
   constexpr static std::string_view WRONG_CLIENT_CONFIG = "Wrong configuration for client"sv;
   constexpr static std::string_view OPTION_MODE_IS_MISSED = "Option mode is missed"sv;
   constexpr static std::string_view UNKNOWN_MODE = "Unknown mode. Choose server/client"sv;
-  constexpr static std::string_view NEGATIVE_PORT = "Port number is less than zero. Are you serious?"sv;
+  constexpr static std::string_view WRONG_ADDRESS_FORMAT = "Wrong address format"sv;
+  constexpr static std::string_view NO_PACKAGES = "No packages"sv;
+  constexpr static std::string_view NON_EXISTENT_PORT = "Non-existent port"sv;
+  constexpr static std::string_view NON_EXISTENT_IP = "Non-existent IP"sv;
 };
 
 struct ProgramOptions {
@@ -39,14 +41,13 @@ struct ProgramOptions {
   constexpr static std::string_view PORT_VALUE_NAME = "port number"sv;
   constexpr static std::string_view PORT_DESC = "Set listening port: from 1024 до 49151 without root"sv;
 
-  constexpr static std::string_view PUBLIC_KEY = "public_key"sv;
+  constexpr static std::string_view PUBLIC_KEY = "public-key"sv;
   constexpr static std::string_view PUBLIC_KEY_VALUE_NAME = "path"sv;
   constexpr static std::string_view PUBLIC_KEY_DESC = "Path to RSA Public Key (public_key.pem)"sv;
 
-  constexpr static std::string_view PRIVATE_KEY = "private_key"sv;
+  constexpr static std::string_view PRIVATE_KEY = "private-key"sv;
   constexpr static std::string_view PRIVATE_KEY_VALUE_NAME = "path"sv;
   constexpr static std::string_view PRIVATE_KEY_DESC = "Path to RSA Private Key (private_key.pem)"sv;
-
 
   // Client options
   constexpr static std::string_view ADDRESSES = "addresses"sv;

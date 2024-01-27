@@ -4,7 +4,7 @@ namespace app {
 
 void Application::Send(std::string_view server_ip,
                        unsigned int port,
-                       std::filesystem::path file_path) {
+                       fs::path file_path) {
   if (!fs::exists(file_path)) {
     throw std::runtime_error("File not found!");
   }
