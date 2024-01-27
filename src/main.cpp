@@ -1,27 +1,40 @@
 #include <iostream>
+#include <memory>
+#include <condition_variable>
+
 #include "Application/Application.h"
+#include "util/command_line_parser.h"
 
 using namespace std::literals;
 
 int main(int argc, char **argv) {
-  app::Application app;
+
+  //TODO Добавить JSON конфиг
+  //TODO Душа требует нормального логирования
+  //TODO Сервер слишком наивный, больше асинхронщины!
+  //TODO Broadcast наше все + отправка многих посылок за раз (парсер уже в курсе)
+  //TODO Обработку сигналов бы еще
+  //TODO Создать уютную хранилку для констант
 
   try {
-    if (argc == 5 && argv[1] == "server"sv) {
-      app.Listen(*argv[2], argv[3], argv[4]);
-    } else if (argc == 5 && argv[1] == "client"sv) {
-      app.Send(argv[2], static_cast<unsigned int>(*argv[3]), argv[4]);
-    } else {
-      std::cout << "Usage: "sv << argv[0] << " server <port>, <RSA-pubkey-path>, <RSA-private-key-path>"sv << std::endl;
-      std::cout << "Usage: "sv << argv[0] << " client <server IP>, <server port>, <file path>"sv << std::endl;
+    app::Application app;
+    util::CommandLineParser parser;
 
-      return 1;
+    auto config = parser.ParseCommandLine(argc, argv);
+
+    if(config->mode == util::Server) {
+        auto& server_config = dynamic_cast<util::ServerConfig&>(*config);
+        app.Listen(server_config.port, server_config.public_key_path, server_config.private_key_path);
     }
+    else if(config->mode == util::Client) {
+      auto& client_config = dynamic_cast<util::ClientConfig&>(*config);
+      app.Send(client_config.servers.at(0).first, client_config.servers.at(0).second, client_config.path_to_packages.at(0));
+    }
+
+    return EXIT_SUCCESS;
   }
   catch (const std::exception &ex) {
     std::cout << ex.what() << std::endl;
-    return 1;
+    return EXIT_FAILURE;
   }
-
-  return 0;
 }

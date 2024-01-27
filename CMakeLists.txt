@@ -4,7 +4,7 @@ project(safe_tunnel CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+conan_basic_setup(TARGETS)
 
 find_package(Boost 1.78.0 REQUIRED)
 find_package(Threads REQUIRED)
@@ -17,8 +17,6 @@ endif ()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-
-
 add_executable(safe_tunnel src/main.cpp
         src/Application/Application.h
         src/Network/Server.h
@@ -28,8 +26,14 @@ add_executable(safe_tunnel src/main.cpp
         src/Application/Application.cpp
         src/Network/Client.cpp
         src/Network/Server.cpp
-        src/Crypto/Crypto.cpp)
+        src/Crypto/Crypto.cpp
+
+        src/util/command_line_parser.h
+        src/util/command_line_parser.cpp src/constants_storage.h)
 
 target_link_libraries(safe_tunnel PRIVATE Threads::Threads
         OpenSSL::SSL
         OpenSSL::Crypto)
+
+target_include_directories(safe_tunnel PRIVATE CONAN_PKG::boost)
+target_link_libraries(safe_tunnel PRIVATE CONAN_PKG::boost)
