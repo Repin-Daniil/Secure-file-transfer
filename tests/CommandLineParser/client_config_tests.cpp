@@ -13,31 +13,31 @@ SCENARIO("Client config", "[CommandLineParser]") {
     std::vector<std::string> packages;
 
     SECTION("One receiver - One package") {
-      addresses = {{"127.0.0.1"s, 3333}};
-      packages = {"img.png"s};
+      addresses = {{"127.0.0.1", 3333}};
+      packages = {"img.png"};
 
       TestClient(addresses, packages);
     }
 
     SECTION("One receiver - five packages") {
-      addresses = {{"127.0.0.1"s, 3333}};
-      packages = {"img.png"s, ".gitignore"s, "README.md"s, "conanfile.txt"s, "package.txt"s};
+      addresses = {{"127.0.0.1", 3333}};
+      packages = {"img.png", ".gitignore", "README.md", "conanfile.txt", "package.txt"};
 
       TestClient(addresses, packages);
     }
 
     SECTION("Five receivers - one package") {
-      addresses = {{"127.0.0.1"s, 3333}, {"192.0.0.1"s, 3333}, {"127.1.0.1"s, 3334}, {"127.0.2.1"s, 3335},
-                   {"127.0.0.1"s, 3336}};
-      packages = {"img.png"s};
+      addresses = {{"127.0.0.1", 3333}, {"192.0.0.1", 3333}, {"127.1.0.1", 3334}, {"127.0.2.1", 3335},
+                   {"127.0.0.1", 3336}};
+      packages = {"img.png"};
 
       TestClient(addresses, packages);
     }
 
     SECTION("Five receivers - five packages") {
-      addresses = {{"127.0.0.1"s, 3333}, {"192.0.0.1"s, 3333}, {"127.1.0.1"s, 3334}, {"127.0.2.1"s, 3335},
-                   {"127.0.0.1"s, 3336}};
-      packages = {"img.png"s, ".gitignore"s, "README.md"s, "conanfile.txt"s, "package.txt"s};
+      addresses = {{"127.0.0.1", 3333}, {"192.0.0.1", 3333}, {"127.1.0.1", 3334}, {"127.0.2.1", 3335},
+                   {"127.0.0.1", 3336}};
+      packages = {"img.png", ".gitignore", "README.md", "conanfile.txt", "package.txt"};
 
       TestClient(addresses, packages);
     }
@@ -49,64 +49,80 @@ SCENARIO("Client config", "[CommandLineParser]") {
 
     SECTION("Negative port number") {
       std::vector<std::string> arguments =
-          {"program_name", "--mode", "client", "--addresses", "127.0.0.2/3233", "127.0.0.1/-3333", "127.0.1.1/-334",
+          {"program_name", "--mode", "client",
+           "--addresses", "127.0.0.2/3233", "127.0.0.1/-3333", "127.0.1.1/-334",
            "--packages", "img.png"};
       CHECK_THROWS_WITH(ParseFromVector(arguments), constants::ExceptionMessage::NON_EXISTENT_PORT.data());
     }
 
     SECTION("Empty packages") {
       std::vector<std::string> arguments =
-          {"program_name", "--mode", "client", "--addresses", "127.0.0.1/3333", "127.0.0.2/3233", "--packages"};
+          {"program_name", "--mode", "client",
+           "--addresses", "127.0.0.1/3333", "127.0.0.2/3233",
+           "--packages"};
       CHECK_THROWS(ParseFromVector(arguments));
     }
 
     SECTION("Empty addresses") {
-      std::vector<std::string> arguments = {"program_name", "--mode", "client", "--addresses", "--packages", "img.png"};
+      std::vector<std::string> arguments = {"program_name", "--mode", "client",
+                                            "--addresses",
+                                            "--packages", "img.png"};
       CHECK_THROWS(ParseFromVector(arguments), constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
     }
 
     SECTION("Only one empty address") {
       std::vector<std::string>
-          arguments = {"program_name", "--mode", "client", "--addresses", "", "--packages", "img.png"};
+          arguments = {"program_name", "--mode", "client",
+                       "--addresses", "",
+                       "--packages", "img.png"};
       CHECK_THROWS(ParseFromVector(arguments), constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
     }
 
     SECTION("Missed port in address") {
       std::vector<std::string> arguments =
-          {"program_name", "--mode", "client", "--addresses", "127.0.0.2/3233", "127.0.0.1/", "--packages", "img.png"};
+          {"program_name", "--mode", "client",
+           "--addresses", "127.0.0.2/3233", "127.0.0.1/",
+           "--packages", "img.png"};
       CHECK_THROWS_WITH(ParseFromVector(arguments), constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
     }
 
     SECTION("Letters in port number") {
       std::vector<std::string> arguments =
-          {"program_name", "--mode", "client", "--addresses", "127.0.0.2/3233", "127.0.0.1/bar", "--packages",
-           "img.png"};
+          {"program_name", "--mode", "client",
+           "--addresses", "127.0.0.2/3233", "127.0.0.1/bar",
+           "--packages", "img.png"};
       CHECK_THROWS_WITH(ParseFromVector(arguments), constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
     }
 
     SECTION("Only IP in address") {
       std::vector<std::string> arguments =
-          {"program_name", "--mode", "client", "--addresses", "127.0.0.2/3233", "127.0.0.1", "--packages", "img.png"};
+          {"program_name", "--mode", "client",
+           "--addresses", "127.0.0.2/3233", "127.0.0.1",
+           "--packages", "img.png"};
       CHECK_THROWS_WITH(ParseFromVector(arguments), constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
     }
 
     SECTION("Wrong IP format") {
       std::vector<std::string> arguments =
-          {"program_name", "--mode", "client", "--addresses", "127.0.0.2/3233", "434053.0.0.1/3321", "--packages",
-           "img.png"};
+          {"program_name", "--mode", "client",
+           "--addresses", "127.0.0.2/3233", "434053.0.0.1/3321",
+           "--packages", "img.png"};
       CHECK_THROWS_WITH(ParseFromVector(arguments), constants::ExceptionMessage::NON_EXISTENT_IP.data());
     }
 
     SECTION("Missed ip in address") {
       std::vector<std::string> arguments =
-          {"program_name", "--mode", "client", "--addresses", "127.0.0.2/3233", "/3333", "--packages", "img.png"};
+          {"program_name", "--mode", "client",
+           "--addresses", "127.0.0.2/3233", "/3333",
+           "--packages", "img.png"};
       CHECK_THROWS_WITH(ParseFromVector(arguments), constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
     }
 
     SECTION("Without delimiter") {
       std::vector<std::string> arguments =
-          {"program_name", "--mode", "client", "--addresses", "127.0.0.2/3233", "127.0.0.1 3333", "--packages",
-           "img.png"};
+          {"program_name", "--mode", "client",
+           "--addresses", "127.0.0.2/3233", "127.0.0.1 3333",
+           "--packages", "img.png"};
       CHECK_THROWS_WITH(ParseFromVector(arguments), constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
     }
   }
@@ -114,11 +130,14 @@ SCENARIO("Client config", "[CommandLineParser]") {
 
 std::unique_ptr<util::Config> GetClientConfig(std::vector<std::pair<std::string, int>> &addresses,
                                               std::vector<std::string> &packages) {
-  std::vector<std::string> arguments = {"program_name", "--mode", "client", "--addresses"};
-  arguments.reserve(addresses.size() + packages.size() + 1);
+  std::string delimiter("/");
+  std::vector<std::string> arguments = {"program_name", "--mode", "client"};
+  arguments.reserve(addresses.size() + packages.size() + delimiter.size());
+
+  arguments.emplace_back("--addresses");
 
   for (auto &address : addresses) {
-    arguments.push_back(address.first + "/"s + std::to_string(address.second));
+    arguments.push_back(address.first + delimiter + std::to_string(address.second));
   }
 
   arguments.emplace_back("--packages");
@@ -144,19 +163,3 @@ void TestClient(std::vector<std::pair<std::string, int>> &addresses, std::vector
     CHECK(client_config.path_to_packages[i] == packages[i]);
   }
 }
-
-/*
- * Тест кейсы!
- * 1) Проверка работы исключений
- *     - Неправильная конфигурация сервера
- *     - Неправильная конфигурация клиента Сделано!!!!!!!!!!!!!!!!
- *     - Пропущено поле Mode
- *     - Неизвестный режим работы программы
- *
- *
- * 2) Проверка верности парсинга
- *    - сервера
- *    - клиента Сделано!!!!!!!!!!!!!!!!!!!!!!!!!!
- *    - None
- *
- */

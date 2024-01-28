@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "Application/Application.h"
 #include "util/command_line_parser.h"
+#include "Application/Application.h"
 
 using namespace std::literals;
 
@@ -12,7 +12,6 @@ int main(int argc, char *argv[]) {
   //TODO Сервер слишком наивный, больше асинхронщины!
   //TODO Broadcast наше все + отправка многих посылок за раз (парсер уже в курсе)
   //TODO Обработку сигналов бы еще
-
 
   try {
     app::Application app;
