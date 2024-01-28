@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 
-project(safe_tunnel CXX)
+project(SFT CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -18,7 +18,7 @@ endif ()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 
-add_executable(safe_tunnel
+add_executable(safe_file_transfer
         src/main.cpp
 
         src/constants_storage.h
@@ -34,7 +34,7 @@ add_executable(safe_tunnel
         src/Crypto/Crypto.cpp
         src/util/command_line_parser.cpp)
 
-target_link_libraries(safe_tunnel PRIVATE
+target_link_libraries(safe_file_transfer PRIVATE
         Threads::Threads
         OpenSSL::SSL
         OpenSSL::Crypto

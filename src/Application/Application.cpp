@@ -27,6 +27,7 @@ void Application::Listen(unsigned int port,
                          const std::string &private_rsa_key) {
   network::Server server;
   crypto::Crypto crypto(public_rsa_key, private_rsa_key);
+  //TODO Сделать, чтобы при неудачном открытии файла вылетало исключение
 
   server.Start(port);
 
