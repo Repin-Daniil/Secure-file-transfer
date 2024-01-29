@@ -20,7 +20,7 @@ void DeleteArgv(int argc, char **argv) {
   delete[] argv;
 }
 
-std::unique_ptr<util::Config> ParseFromVector(const std::vector<std::string> &arguments) {
+std::unique_ptr<config::Config> ParseFromVector(const std::vector<std::string> &arguments) {
   int argc = arguments.size();
   auto argv = MakeArgv(arguments);
 

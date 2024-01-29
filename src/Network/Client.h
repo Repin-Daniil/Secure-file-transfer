@@ -1,16 +1,18 @@
 #pragma once
 
-#include <boost/asio.hpp>
 #include <string>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 
+#include <boost/asio.hpp>
+
 namespace network {
 
 namespace net = boost::asio;
+namespace ip = net::ip;
 
-using net::ip::tcp;
+using ip::tcp;
 using namespace std::literals;
 
 struct Package {
@@ -19,9 +21,13 @@ struct Package {
   std::ifstream stream;
 };
 
+/*!
+ * @brief Класс для отправки файлов по TCP
+ * @todo Ну разным серверам можно в разных потоках отправлять
+ */
 class Client {
  public:
-  void Connect(std::string_view ip_address, unsigned int port);
+  void Connect(std::string_view ip_address, int port);
   std::string RequestServerPublicKey();
   void SendFile(Package package);
 
@@ -33,4 +39,4 @@ class Client {
   std::string ReadFromSocket();
 };
 
-} // namespace network
+}  // namespace network

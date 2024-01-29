@@ -2,7 +2,7 @@
 
 namespace network {
 
-void Server::Start(unsigned int port) {
+void Server::Start(int port) {
   boost::system::error_code ec;
 
   std::filesystem::create_directory(std::filesystem::current_path().c_str() + "/tmp"s);
@@ -96,4 +96,4 @@ std::string Server::ReadFromSocket() {
   return response;
 }
 
-} // namespace network
+}  // namespace network

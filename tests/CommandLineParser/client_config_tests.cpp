@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 
-std::unique_ptr<util::Config> GetClientConfig(std::vector<std::pair<std::string, int>> &addresses,
+std::unique_ptr<config::Config> GetClientConfig(std::vector<std::pair<std::string, int>> &addresses,
                                               std::vector<std::string> &packages);
 void TestClient(std::vector<std::pair<std::string, int>> &addresses, std::vector<std::string> &packages);
 
@@ -128,7 +128,7 @@ SCENARIO("Client config", "[CommandLineParser]") {
   }
 }
 
-std::unique_ptr<util::Config> GetClientConfig(std::vector<std::pair<std::string, int>> &addresses,
+std::unique_ptr<config::Config> GetClientConfig(std::vector<std::pair<std::string, int>> &addresses,
                                               std::vector<std::string> &packages) {
   std::string delimiter("/");
   std::vector<std::string> arguments = {"program_name", "--mode", "client"};
@@ -148,9 +148,9 @@ std::unique_ptr<util::Config> GetClientConfig(std::vector<std::pair<std::string,
 
 void TestClient(std::vector<std::pair<std::string, int>> &addresses, std::vector<std::string> &packages) {
   auto config = GetClientConfig(addresses, packages);
-  auto &client_config = dynamic_cast<util::ClientConfig &>(*config);
+  auto &client_config = dynamic_cast<config::ClientConfig &>(*config);
 
-  REQUIRE(client_config.mode == util::Mode::Client);
+  REQUIRE(client_config.mode == config::Mode::CLIENT);
   REQUIRE(client_config.path_to_packages.size() == packages.size());
   REQUIRE(client_config.servers.size() == addresses.size());
 

@@ -2,8 +2,9 @@
 
 namespace util {
 
-std::unique_ptr<Config> CommandLineParser::ParseCommandLine(int argc, const char *const argv[]) {
-  using namespace constants;
+std::unique_ptr<config::Config> CommandLineParser::ParseCommandLine(int argc, const char *const argv[]) {
+  using constants::ProgramOptions;
+  using constants::ExceptionMessage;
   namespace po = boost::program_options;
 
   po::options_description desc(ProgramOptions::GENERAL_OPTIONS.data());
@@ -47,14 +48,14 @@ std::unique_ptr<Config> CommandLineParser::ParseCommandLine(int argc, const char
     desc.add(server_options_description).add(client_options_description);
     std::cout << desc;
 
-    return std::make_unique<NullConfig>();
+    return std::make_unique<config::NullConfig>();
   }
 
   if (!vm.contains(ProgramOptions::MODE.data())) {
     throw std::runtime_error(ExceptionMessage::OPTION_MODE_IS_MISSED.data());
   }
 
-  std::unique_ptr<Config> config;
+  std::unique_ptr<config::Config> config;
 
   if (args_.mode == ProgramOptions::MODE_SERVER.data()) {
     desc.add(server_options_description);
@@ -71,7 +72,7 @@ std::unique_ptr<Config> CommandLineParser::ParseCommandLine(int argc, const char
       throw std::runtime_error(constants::ExceptionMessage::NON_EXISTENT_PORT.data());
     }
 
-    config = std::make_unique<ServerConfig>(args_.port, args_.path_to_public_key, args_.path_to_private_key);
+    config = std::make_unique<config::ServerConfig>(args_.port, args_.path_to_public_key, args_.path_to_private_key);
   } else if (args_.mode == ProgramOptions::MODE_CLIENT.data()) {
     desc.add(client_options_description);
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -81,7 +82,7 @@ std::unique_ptr<Config> CommandLineParser::ParseCommandLine(int argc, const char
       throw std::runtime_error(ExceptionMessage::WRONG_CLIENT_CONFIG.data());
     }
 
-    config = std::make_unique<ClientConfig>(ParseAddresses(), ParsePaths());
+    config = std::make_unique<config::ClientConfig>(ParseAddresses(), ParsePaths());
   } else {
     desc.add(server_options_description).add(client_options_description);
     std::cout << desc << std::endl;
@@ -92,7 +93,7 @@ std::unique_ptr<Config> CommandLineParser::ParseCommandLine(int argc, const char
   return config;
 }
 
-ClientConfig::Address CommandLineParser::ConvertStrToAddress(const std::string &str) {
+config::ClientConfig::Address CommandLineParser::ConvertStrToAddress(const std::string &str) {
   std::string delimiter = constants::ProgramOptions::ADDRESSES_DELIMITER.data();
   auto delimiter_pos = str.find(delimiter);
 
@@ -138,8 +139,8 @@ std::vector<fs::path> CommandLineParser::ParsePaths() {
   return std::move(packages_path);
 }
 
-std::vector<ClientConfig::Address> CommandLineParser::ParseAddresses() {
-  std::vector<ClientConfig::Address> servers;
+std::vector<config::ClientConfig::Address> CommandLineParser::ParseAddresses() {
+  std::vector<config::ClientConfig::Address> servers;
 
   for (const auto &address_str : args_.addresses) {
     servers.emplace_back(ConvertStrToAddress(address_str));
@@ -148,4 +149,4 @@ std::vector<ClientConfig::Address> CommandLineParser::ParseAddresses() {
   return std::move(servers);
 }
 
-} // namespace util
+}  // namespace util

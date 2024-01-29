@@ -7,7 +7,7 @@ std::string Crypto::GetPublicKeyAsString() {
   PEM_write_bio_RSA_PUBKEY(bio, public_key_);
 
   char *buffer_ptr;
-  long length = BIO_get_mem_data(bio, &buffer_ptr);
+  int64_t length = BIO_get_mem_data(bio, &buffer_ptr);
   std::string result(buffer_ptr, length);
 
   BIO_free(bio);
@@ -288,4 +288,4 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
   return output_file_path.string();
 }
 
-} // namespace crypto
+}  // namespace crypto

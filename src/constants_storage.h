@@ -64,4 +64,4 @@ struct ProgramOptions {
   constexpr static std::string_view PACKAGES_DESC = "Set path to files"sv;
 };
 
-} // namespace constants
+}  // namespace constants

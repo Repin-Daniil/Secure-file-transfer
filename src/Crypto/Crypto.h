@@ -1,18 +1,21 @@
 #pragma once
 
-#include <iostream>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
+
+#include <iostream>
 #include <vector>
 #include <cstring>
 #include <fstream>
 #include <filesystem>
+#include <utility>
+#include <string>
 
 namespace crypto {
 
 class Crypto {
  public:
-  Crypto(std::string public_key);
+  explicit Crypto(std::string public_key);
   Crypto(std::string public_key_path, std::string private_key_path);
   ~Crypto();
 
@@ -36,4 +39,4 @@ class Crypto {
   std::vector<unsigned char> DecryptWithPrivateKey(const std::vector<unsigned char> &encrypted_data);
 };
 
-} // namespace crypto
+}  // namespace crypto

@@ -3,12 +3,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 
-std::unique_ptr<util::Config> GetServerConfig(int port, std::string &public_key_path, std::string &private_key_path);
+std::unique_ptr<config::Config> GetServerConfig(int port, std::string &public_key_path, std::string &private_key_path);
 void TestServer(int port, std::string &public_key_path, std::string &private_key_path);
 
 SCENARIO("Server config", "[CommandLineParser]") {
-  using namespace constants;
-
   int port = 0;
   std::string public_key_path = "public_key.pem";
   std::string private_key_path = "private_key.pem";
@@ -31,7 +29,7 @@ SCENARIO("Server config", "[CommandLineParser]") {
   }
 }
 
-std::unique_ptr<util::Config> GetServerConfig(int port, std::string &public_key_path, std::string &private_key_path) {
+std::unique_ptr<config::Config> GetServerConfig(int port, std::string &public_key_path, std::string &private_key_path) {
   using namespace constants;
   std::vector<std::string> arguments = {"program_name"s, "--mode"s, "server",
                                         "--port"s, std::to_string(port),
@@ -43,9 +41,9 @@ std::unique_ptr<util::Config> GetServerConfig(int port, std::string &public_key_
 
 void TestServer(int port, std::string &public_key_path, std::string &private_key_path) {
   auto config = GetServerConfig(port, public_key_path, private_key_path);
-  auto &server_config = dynamic_cast<util::ServerConfig &>(*config);
+  auto &server_config = dynamic_cast<config::ServerConfig &>(*config);
 
-  REQUIRE(server_config.mode == util::Mode::Server);
+  REQUIRE(server_config.mode == config::Mode::SERVER);
   CHECK(server_config.port == port);
   CHECK(server_config.public_key_path == public_key_path);
   CHECK(server_config.private_key_path == private_key_path);

@@ -6,7 +6,7 @@
 TEST_CASE("None-mode", "[CommandLineParser]") {
   std::vector<std::string> arguments = {"program_name", "--help"};
   auto config = ParseFromVector(arguments);
-  CHECK(config->mode == util::None);
+  CHECK(config->mode == config::Mode::NONE);
 }
 
 TEST_CASE("Unknown mode", "[CommandLineParser]") {

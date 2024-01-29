@@ -2,7 +2,7 @@
 
 namespace network {
 
-void Client::Connect(std::string_view ip_address, unsigned int port) {
+void Client::Connect(std::string_view ip_address, int port) {
   boost::system::error_code ec;
   auto endpoint = tcp::endpoint(net::ip::make_address(ip_address, ec), port);
 
@@ -87,4 +87,4 @@ std::string Client::ReadFromSocket() {
   return response;
 }
 
-} // namespace network
+}  // namespace network
