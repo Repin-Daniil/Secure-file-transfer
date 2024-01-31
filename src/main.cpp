@@ -2,16 +2,13 @@
 
 
 #include "util/logger/logger.h"
-#include "util/Parser/command_line_parser.h"
+#include "util/parser/command_line_parser.h"
 #include "app/Application.h"
 
 using namespace std::literals;
 using config::Mode;
 
 int main(int argc, char *argv[]) {
-  // TODO Душа требует нормального логирования
-  // TODO Обработку сигналов бы еще
-
   LoggerInit();
 
   try {

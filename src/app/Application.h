@@ -5,9 +5,9 @@
 #include <iostream>
 #include <string>
 
-#include "../Network/Server.h"
-#include "../Network/Client.h"
-#include "../Crypto/Crypto.h"
+#include "../network/Server.h"
+#include "../network/Client.h"
+#include "../crypto/Crypto.h"
 #include "../util/logger/logger.h"
 
 namespace app {
@@ -15,6 +15,7 @@ namespace app {
 namespace fs = std::filesystem;
 
 using namespace std::literals;
+
 /*!
  * @brief
  * @todo Если файлов несколько, то паковать в zip-архив
