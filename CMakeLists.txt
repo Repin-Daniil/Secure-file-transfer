@@ -22,17 +22,19 @@ add_executable(safe_file_transfer
         src/main.cpp
 
         src/constants_storage.h
-        src/Application/Application.h
-        src/Network/Server.h
-        src/Network/Client.h
-        src/Crypto/Crypto.h
-        src/util/Parser/command_line_parser.h
+        src/app/Application.h
+        src/network/Server.h
+        src/network/Client.h
+        src/crypto/Crypto.h
+        src/util/parser/command_line_parser.h
+        src/util/logger/logger.h
 
-        src/Application/Application.cpp
-        src/Network/Client.cpp
-        src/Network/Server.cpp
-        src/Crypto/Crypto.cpp
-        src/util/Parser/command_line_parser.cpp src/config.h)
+        src/app/Application.cpp
+        src/network/Client.cpp
+        src/network/Server.cpp
+        src/crypto/Crypto.cpp
+        src/util/parser/command_line_parser.cpp
+        src/config.h src/util/logger/logger.cpp)
 
 target_link_libraries(safe_file_transfer PRIVATE
         Threads::Threads
@@ -42,7 +44,11 @@ target_link_libraries(safe_file_transfer PRIVATE
 
 # Tests
 enable_testing()
-add_executable(ParserTest
-        tests/CommandLineParser/client_config_tests.cpp src/util/Parser/command_line_parser.h src/util/Parser/command_line_parser.cpp tests/CommandLineParser/server_config_tests.cpp tests/CommandLineParser/test_framework_for_parser.cpp tests/CommandLineParser/test_framework_for_parser.h tests/CommandLineParser/general_tests.cpp src/config.h)
-target_link_libraries(ParserTest PRIVATE CONAN_PKG::catch2  CONAN_PKG::boost )
+add_executable(ParserTest src/util/parser/command_line_parser.cpp
+        tests/CommandLineParser/test_framework_for_parser.cpp
+        tests/CommandLineParser/client_config_tests.cpp
+        tests/CommandLineParser/server_config_tests.cpp
+        tests/CommandLineParser/general_tests.cpp)
+
+target_link_libraries(ParserTest PRIVATE CONAN_PKG::catch2 CONAN_PKG::boost)
 add_test(NAME PARSER_TEST COMMAND ParserTest)

@@ -67,8 +67,8 @@ sudo ./build/bin/safe_file_transfer --mode server --port 3333 --public-key res/p
 ```shell
 ctest --extra-verbose --test-dir build
 ```
-
-### Архитектура приложения
+# Архитектура
+### UML-диаграмма приложения
 
 ![](res/UML.png)
 

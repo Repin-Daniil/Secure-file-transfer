@@ -6,8 +6,8 @@ void Server::Start(int port) {
   boost::system::error_code ec;
 
   std::filesystem::create_directory(std::filesystem::current_path().c_str() + "/tmp"s);
-
-  std::cout << "Waiting for connection"sv << std::endl;
+  LogInfo("Server start"sv);
+  LogInfo("Waiting for connection"sv);
 
   tcp::acceptor acceptor(io_context_, tcp::endpoint(tcp::v4(), port));
   acceptor.accept(socket_, ec);
@@ -16,7 +16,11 @@ void Server::Start(int port) {
     throw std::runtime_error("Can`t accept connection");
   }
 
-  std::cout << ReadFromSocket();
+  LogInfo("Accept connection"sv);
+
+  auto request = ReadFromSocket();
+
+  LogTrace(request);
 }
 
 void Server::SendPublicKey(const std::string &public_key) {
@@ -27,7 +31,7 @@ void Server::SendPublicKey(const std::string &public_key) {
     throw std::runtime_error("Error while sending public key");
   }
 
-  std::cout << "Send public key" << std::endl;
+  LogTrace("Send public key"sv);
 }
 
 fs::path Server::DownloadFile() {
@@ -36,8 +40,8 @@ fs::path Server::DownloadFile() {
   std::string file_name = file_data.first;
   uint64_t file_size = file_data.second;
 
-  std::cout << "File name: " << file_name << std::endl;
-  std::cout << "File size: " << file_size << std::endl;
+  LogTrace("File name: "s + file_name);
+  LogTrace("File size: " + std::to_string(file_size));
 
   auto path = fs::current_path().c_str() + "/tmp/"s + file_name;
   std::ofstream output_file_stream(path, std::ios::binary);
@@ -46,23 +50,28 @@ fs::path Server::DownloadFile() {
     throw std::runtime_error("Can't create file");
   }
 
-  std::cout << "Download started " << std::endl;
+  LogInfo("Download started"sv);
 
-  size_t bytes_amount = 0;
   net::streambuf buffer;
+  boost::timer::progress_display progress_bar(file_size);
+  auto start = std::chrono::steady_clock::now();
 
   if (buffer.size()) {
-    bytes_amount += buffer.size();
+    progress_bar += buffer.size();
     output_file_stream << &buffer;
   }
 
-  while (bytes_amount < file_size) {
-    bytes_amount += boost::asio::read(socket_, buffer, boost::asio::transfer_at_least(1));
+  while (progress_bar.count() < file_size) {
+    progress_bar += boost::asio::read(socket_, buffer, boost::asio::transfer_at_least(1));
     output_file_stream << &buffer;
   }
 
-  std::cout << "Download complete" << std::endl;
-  std::cout << "Received bytes: " << bytes_amount << std::endl;
+  auto end = std::chrono::steady_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+
+  LogInfo("Download complete"sv);
+  LogTrace("Received bytes: "s + std::to_string(progress_bar.count()));
+  LogTrace("Loading time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
 
   socket_.write_some(net::buffer("Success\n"));
 

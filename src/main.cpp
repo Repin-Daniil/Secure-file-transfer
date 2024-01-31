@@ -1,7 +1,9 @@
 #include <iostream>
 
+
+#include "util/logger/logger.h"
 #include "util/Parser/command_line_parser.h"
-#include "Application/Application.h"
+#include "app/Application.h"
 
 using namespace std::literals;
 using config::Mode;
@@ -9,6 +11,9 @@ using config::Mode;
 int main(int argc, char *argv[]) {
   // TODO Душа требует нормального логирования
   // TODO Обработку сигналов бы еще
+
+  LoggerInit();
+
   try {
     app::Application app;
     util::CommandLineParser parser;
@@ -30,7 +35,8 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
   }
   catch (const std::exception &ex) {
-    std::cout << ex.what() << std::endl;
+    LogFatal(ex.what());
+
     return EXIT_FAILURE;
   }
 }

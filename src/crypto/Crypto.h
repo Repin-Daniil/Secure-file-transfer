@@ -11,7 +11,13 @@
 #include <utility>
 #include <string>
 
+#include <boost/timer/progress_display.hpp>
+
+#include "../util/logger/logger.h"
+
 namespace crypto {
+
+using namespace std::literals;
 
 class Crypto {
  public:
@@ -24,11 +30,6 @@ class Crypto {
   std::string GetPublicKeyAsString();
 
  private:
-  RSA *public_key_;
-  RSA *private_key_;
-  std::pair<bool, bool> keys_ = std::pair(false, false);
-
-  // Methods
   RSA *CreatePublicKeyFromString(const std::string &pem_string);
   RSA *ReadPublicKeyFromPEM(const std::string &public_key_file_path);
   RSA *ReadPrivateKeyFromPEM(const std::string &private_key_file_path);
@@ -37,6 +38,11 @@ class Crypto {
   std::vector<unsigned char> DecryptDataBlock(const std::vector<unsigned char> &encrypted_data);
   std::vector<unsigned char> EncryptWithPublicKey(const std::vector<unsigned char> &data);
   std::vector<unsigned char> DecryptWithPrivateKey(const std::vector<unsigned char> &encrypted_data);
+
+ private:
+  RSA *public_key_;
+  RSA *private_key_;
+  std::pair<bool, bool> keys_ = std::pair(false, false);
 };
 
 }  // namespace crypto

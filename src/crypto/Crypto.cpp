@@ -2,6 +2,8 @@
 
 namespace crypto {
 
+// FIXME
+
 std::string Crypto::GetPublicKeyAsString() {
   BIO *bio = BIO_new(BIO_s_mem());
   PEM_write_bio_RSA_PUBKEY(bio, public_key_);
@@ -211,13 +213,12 @@ Crypto::~Crypto() {
 }
 
 std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
-  std::cout << "Encrypting..." << std::endl;
-
   if (!std::filesystem::exists(file_path)) {
     throw std::runtime_error("Error: File not found");
   }
 
   std::ifstream file_stream(file_path, std::ios::binary);
+
   if (!file_stream.is_open()) {
     throw std::runtime_error("Error: Unable to open file");
   }
@@ -231,6 +232,11 @@ std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
     throw std::runtime_error("Error: Unable to create combined output file");
   }
 
+  LogInfo("Start encrypting"s);
+
+  boost::timer::progress_display progress_bar(std::filesystem::file_size(file_path));
+  auto start = std::chrono::steady_clock::now();
+
   std::streamsize block_size = 20480;
   std::vector<unsigned char> buffer(block_size);
 
@@ -242,16 +248,20 @@ std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
       std::vector<unsigned char> encrypted_data = EncryptWithPublicKey(data);
       combined_output_file.write(reinterpret_cast<const char *>(encrypted_data.data()), encrypted_data.size());
     }
+
+    progress_bar += bytes_read;
   }
 
-  std::cout << "Encrypted!" << std::endl;
+  auto end = std::chrono::steady_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+
+  LogInfo("Encrypted"sv);
+  LogTrace("Encryption time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
 
   return output_file_path;
 }
 
 std::string Crypto::DecryptFile(std::filesystem::path file_path) {
-  std::cout << "Decrypting..." << std::endl;
-
   if (!std::filesystem::exists(file_path)) {
     throw std::runtime_error("Error: File not found");
   }
@@ -270,20 +280,31 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
     throw std::runtime_error("Error: Unable to create output file");
   }
 
+  LogInfo("Start decrypting"s);
+  auto start = std::chrono::steady_clock::now();
+
   std::streamsize block_size = 20480;
   std::vector<unsigned char> buffer(block_size);
+  boost::timer::progress_display progress_bar(std::filesystem::file_size(file_path));
 
   while (!combined_input_file.eof()) {
     combined_input_file.read(reinterpret_cast<char *>(buffer.data()), block_size);
     auto bytes_read = combined_input_file.gcount();
+
     if (bytes_read > 0) {
       std::vector<unsigned char> encrypted_data(buffer.begin(), buffer.begin() + bytes_read);
       std::vector<unsigned char> decrypted_data = DecryptWithPrivateKey(encrypted_data);
       output_file.write(reinterpret_cast<const char *>(decrypted_data.data()), decrypted_data.size());
     }
+
+    progress_bar += bytes_read;
   }
 
-  std::cout << "Decrypted!" << std::endl;
+  auto end = std::chrono::steady_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+
+  LogInfo("Decrypted!"sv);
+  LogTrace("Decryption time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
 
   return output_file_path.string();
 }

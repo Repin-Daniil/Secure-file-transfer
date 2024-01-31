@@ -8,6 +8,9 @@
 
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
+#include <boost/timer/progress_display.hpp>
+
+#include "../util/logger/logger.h"
 
 namespace network {
 
@@ -29,12 +32,12 @@ class Server {
   fs::path DownloadFile();
 
  private:
-  net::io_context io_context_;
-  tcp::socket socket_{io_context_};
-
-  //  Methods
   std::string ReadFromSocket();
   std::pair<std::string, uint64_t> GetNameAndSize(const std::string &input);
+
+ private:
+  net::io_context io_context_;
+  tcp::socket socket_{io_context_};
 };
 
 }  // namespace network

@@ -6,6 +6,9 @@
 #include <iostream>
 
 #include <boost/asio.hpp>
+#include <boost/timer/progress_display.hpp>
+
+#include "../util/logger/logger.h"
 
 namespace network {
 

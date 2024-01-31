@@ -16,12 +16,13 @@ void Client::Connect(std::string_view ip_address, int port) {
     throw std::runtime_error("Can't connect to server");
   }
 
-  std::cout << "Connect to server" << std::endl;
+  LogInfo("Connect to server"sv);
 }
 
 std::string Client::RequestServerPublicKey() {
   boost::system::error_code ec;
 
+  LogTrace("Request Public Key from server");
   socket_.write_some(net::buffer("Request for public key\n"sv), ec);
 
   if (ec) {
@@ -29,7 +30,7 @@ std::string Client::RequestServerPublicKey() {
   }
 
   auto public_key = ReadFromSocket();
-  std::cout << "Get Public Key from server" << std::endl;
+  LogTrace("Get Public Key from server");
 
   return public_key;
 }
@@ -37,6 +38,7 @@ std::string Client::RequestServerPublicKey() {
 void Client::SendFile(Package package) {
   boost::system::error_code ec;
 
+  LogTrace("Send file name and size"sv);
   net::write(socket_,
              boost::asio::buffer(
                  "FileName(" + package.file_name + "); FileSize(" + std::to_string(package.file_size) + ")\n"),
@@ -46,29 +48,35 @@ void Client::SendFile(Package package) {
     throw std::runtime_error("Error sending FileName and FileSize");
   }
 
-  std::cout << "Upload start" << std::endl;
+  LogInfo("Upload start"sv);
+
+  boost::timer::progress_display progress_bar(package.file_size);
+  auto start = std::chrono::steady_clock::now();
 
   std::array<char, 10000> file_buffer{};
-  uint64_t bytes_sent = 0;
   size_t buffer_size = file_buffer.size();
 
   while (package.stream) {
     package.stream.read(file_buffer.data(), buffer_size);
-    bytes_sent += net::write(socket_, net::buffer(file_buffer.data(), package.stream.gcount()), ec);
+    progress_bar += net::write(socket_, net::buffer(file_buffer.data(), package.stream.gcount()), ec);
   }
 
   package.stream.close();
 
-  if (bytes_sent != package.file_size) {
+  LogTrace("Bytes sent: "s + std::to_string(progress_bar.count()));
+
+  if (progress_bar.count() != package.file_size) {
     throw std::runtime_error("Package sending failed");
   }
 
-  std::cout << "File Name: " << package.file_name << std::endl
-            << "File Size: " << package.file_size << std::endl
-            << "Bytes sent: " << bytes_sent << std::endl;
+  auto end = std::chrono::steady_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
 
-  std::cout << "Waiting for server's response" << std::endl;
-  std::cout << ReadFromSocket();
+  LogTrace("File Name: "s + package.file_name);
+  LogTrace("File Size: "s + std::to_string(package.file_size));
+
+  LogInfo("Waiting for server's response");
+  LogInfo(ReadFromSocket());
 }
 
 std::string Client::ReadFromSocket() {

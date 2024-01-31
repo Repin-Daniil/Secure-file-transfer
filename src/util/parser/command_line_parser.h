@@ -13,6 +13,7 @@
 
 #include "../../config.h"
 #include "../../constants_storage.h"
+#include "../logger/logger.h"
 
 namespace util {
 
