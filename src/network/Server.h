@@ -5,12 +5,15 @@
 #include <filesystem>
 #include <utility>
 #include <string>
+#include <optional>
+#include <vector>
 
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
 #include <boost/timer/progress_display.hpp>
 
 #include "../util/logger/logger.h"
+#include "../constants_storage.h"
 
 namespace network {
 
@@ -27,12 +30,13 @@ using namespace std::literals;
  */
 class Server {
  public:
-  void Start(int port);
+  std::string Start(int port);
   void SendPublicKey(const std::string &public_key);
   fs::path DownloadFile();
 
  private:
-  std::string ReadFromSocket();
+  std::string Read();
+  void Send(const std::vector<std::string_view> &response);
   std::pair<std::string, uint64_t> GetNameAndSize(const std::string &input);
 
  private:

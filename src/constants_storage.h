@@ -64,4 +64,23 @@ struct ProgramOptions {
   constexpr static std::string_view PACKAGES_DESC = "Set path to files"sv;
 };
 
+struct NetworkConstants {
+  NetworkConstants() = delete;
+
+  constexpr static std::string_view CRLF = "\r\n"sv;
+  constexpr static std::string_view DOUBLE_CRLF = "\r\n\r\n"sv;
+
+  constexpr static std::string_view REQUEST_FOR_PUBLIC_KEY = "RPK"sv;
+
+  constexpr static std::string_view FILE_NAME_HEADER = "File name: "sv;
+  constexpr static std::string_view FILE_SIZE_HEADER = "File size: "sv;
+  constexpr static std::string_view PUBLIC_KEY_HEADER = "Public key: "sv;
+
+  constexpr static std::string_view PUBLIC_KEY_PATTERN = "Public key: (.+)";
+  constexpr static std::string_view FILE_ATTRIBUTES_PATTERN = "File name: (.+)\r\nFile size: (\\d+)";
+
+  constexpr static std::string_view OK = "OK"sv;
+  constexpr static std::string_view FAILED = "FAILED"sv;
+};
+
 }  // namespace constants

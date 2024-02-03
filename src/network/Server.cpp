@@ -2,7 +2,9 @@
 
 namespace network {
 
-void Server::Start(int port) {
+using constants::NetworkConstants;
+
+std::string Server::Start(int port) {
   boost::system::error_code ec;
 
   std::filesystem::create_directory(std::filesystem::current_path().c_str() + "/tmp"s);
@@ -18,30 +20,32 @@ void Server::Start(int port) {
 
   LogInfo("Accept connection"sv);
 
-  auto request = ReadFromSocket();
-
+  LogTrace("Read Client Request"sv);
+  auto request = Read();
   LogTrace(request);
+
+  return request;
 }
 
 void Server::SendPublicKey(const std::string &public_key) {
   boost::system::error_code ec;
-  socket_.write_some(net::buffer(public_key + "\n"), ec);
 
-  if (ec) {
-    throw std::runtime_error("Error while sending public key");
-  }
-
-  LogTrace("Send public key"sv);
+  LogTrace("Send Public key to client");
+  Send({NetworkConstants::PUBLIC_KEY_HEADER, public_key});
 }
 
 fs::path Server::DownloadFile() {
-  auto file_data = GetNameAndSize(ReadFromSocket());
+  boost::system::error_code ec;
+
+  LogTrace("Reading file attributes"sv);
+  auto request = Read();
+  auto file_data = GetNameAndSize(request);
 
   std::string file_name = file_data.first;
   uint64_t file_size = file_data.second;
 
   LogTrace("File name: "s + file_name);
-  LogTrace("File size: " + std::to_string(file_size));
+  LogTrace("File size: "s + std::to_string(file_size));
 
   auto path = fs::current_path().c_str() + "/tmp/"s + file_name;
   std::ofstream output_file_stream(path, std::ios::binary);
@@ -62,7 +66,7 @@ fs::path Server::DownloadFile() {
   }
 
   while (progress_bar.count() < file_size) {
-    progress_bar += boost::asio::read(socket_, buffer, boost::asio::transfer_at_least(1));
+    progress_bar += net::read(socket_, buffer, boost::asio::transfer_at_least(1));
     output_file_stream << &buffer;
   }
 
@@ -73,36 +77,58 @@ fs::path Server::DownloadFile() {
   LogTrace("Received bytes: "s + std::to_string(progress_bar.count()));
   LogTrace("Loading time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
 
-  socket_.write_some(net::buffer("Success\n"));
+  LogTrace("Send status to client");
+  Send({NetworkConstants::OK});
 
   return path;
 }
 
 std::pair<std::string, uint64_t> Server::GetNameAndSize(const std::string &input) {
   boost::smatch matches;
-  boost::regex pattern(R"(FileName\(([^)]+)\);\sFileSize\((\d+)\))");
+  boost::regex pattern(NetworkConstants::FILE_ATTRIBUTES_PATTERN.data());
 
   if (boost::regex_search(input, matches, pattern)) {
-    return std::pair(matches[1], std::stoll(matches[2].str()));
+    if (matches.size() > 2) {
+      return std::pair(matches[1], std::stoll(matches[2]));
+    }
   }
 
-  throw std::runtime_error("Error, Wrong Format!");
+  throw std::runtime_error("Error, Wrong Format of File attributes!");
 }
 
-std::string Server::ReadFromSocket() {
+std::string Server::Read() {
+  net::streambuf stream_buf;
   boost::system::error_code ec;
 
-  net::streambuf stream_buf;
-  net::read_until(socket_, stream_buf, '\n', ec);
+  net::read_until(socket_, stream_buf, NetworkConstants::DOUBLE_CRLF, ec);
 
   if (ec) {
-    throw std::runtime_error("Error while reading");
+    throw std::runtime_error("Error while reading request");
   }
 
-  std::string response{std::istreambuf_iterator<char>(&stream_buf),
-                       std::istreambuf_iterator<char>()};
+  std::string request{std::istreambuf_iterator<char>(&stream_buf),
+                      std::istreambuf_iterator<char>()};
 
-  return response;
+  LogTrace("Request: "s + request);
+
+  return request;
 }
 
+void Server::Send(const std::vector<std::string_view> &response) {
+  std::stringstream ss;
+  boost::system::error_code ec;
+
+  for (auto &msg : response) {
+    ss << msg << NetworkConstants::CRLF;
+  }
+
+  ss << NetworkConstants::CRLF;
+  LogTrace("Response: "s + ss.str());
+
+  socket_.write_some(net::buffer(ss.str()), ec);
+
+  if (ec) {
+    throw std::runtime_error("Error while sending response");
+  }
+}
 }  // namespace network

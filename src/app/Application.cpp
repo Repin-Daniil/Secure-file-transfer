@@ -2,6 +2,8 @@
 
 namespace app {
 
+using constants::NetworkConstants;
+
 void Application::Send(std::string_view server_ip,
                        int port,
                        fs::path file_path) {
@@ -9,7 +11,6 @@ void Application::Send(std::string_view server_ip,
     throw std::runtime_error("File not found!");
   }
 
-  // FIXME
   network::Client client;
 
   client.Connect(server_ip, port);
@@ -27,9 +28,9 @@ void Application::Listen(int port,
                          const std::string &private_rsa_key) {
   network::Server server;
   crypto::Crypto crypto(public_rsa_key, private_rsa_key);
-  // FIXME
 
-  server.Start(port);
+  auto request = server.Start(port);
+
   auto public_key = crypto.GetPublicKeyAsString();
   server.SendPublicKey(public_key);
 
