@@ -10,7 +10,7 @@ namespace keywords = boost::log::keywords;
 void LoggerInit() {
   logging::add_common_attributes();
 
-  logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::trace);
+  logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::info);
 
   logging::add_console_log(
       std::clog,

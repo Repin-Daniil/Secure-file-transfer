@@ -19,6 +19,7 @@ using namespace std::literals;
 /*!
  * @brief
  * @todo Если файлов несколько, то паковать в zip-архив
+ * @todo Добавить контрольную сумму
  * @todo Сделать broadcast отправку
  */
 class Application {
