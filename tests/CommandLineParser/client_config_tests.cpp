@@ -4,7 +4,7 @@
 #include <catch2/matchers/catch_matchers.hpp>
 
 std::unique_ptr<config::Config> GetClientConfig(std::vector<std::pair<std::string, int>> &addresses,
-                                              std::vector<std::string> &packages);
+                                                std::vector<std::string> &packages);
 void TestClient(std::vector<std::pair<std::string, int>> &addresses, std::vector<std::string> &packages);
 
 SCENARIO("Client config", "[CommandLineParser]") {
@@ -129,7 +129,7 @@ SCENARIO("Client config", "[CommandLineParser]") {
 }
 
 std::unique_ptr<config::Config> GetClientConfig(std::vector<std::pair<std::string, int>> &addresses,
-                                              std::vector<std::string> &packages) {
+                                                std::vector<std::string> &packages) {
   std::string delimiter("/");
   std::vector<std::string> arguments = {"program_name", "--mode", "client"};
   arguments.reserve(addresses.size() + packages.size() + delimiter.size());

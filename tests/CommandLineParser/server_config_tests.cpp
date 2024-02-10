@@ -3,8 +3,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 
-std::unique_ptr<config::Config> GetServerConfig(int port, std::string &public_key_path, std::string &private_key_path);
-void TestServer(int port, std::string &public_key_path, std::string &private_key_path);
+std::unique_ptr<config::Config> GetServerConfig(int port,
+                                                const std::string &public_key_path,
+                                                const std::string &private_key_path);
+void TestServer(int port, const std::string &public_key_path, const std::string &private_key_path);
 
 SCENARIO("Server config", "[CommandLineParser]") {
   int port = 0;
@@ -29,17 +31,18 @@ SCENARIO("Server config", "[CommandLineParser]") {
   }
 }
 
-std::unique_ptr<config::Config> GetServerConfig(int port, std::string &public_key_path, std::string &private_key_path) {
-  using namespace constants;
-  std::vector<std::string> arguments = {"program_name"s, "--mode"s, "server",
-                                        "--port"s, std::to_string(port),
-                                        "--public-key"s, public_key_path,
-                                        "--private-key"s, private_key_path};
+std::unique_ptr<config::Config> GetServerConfig(int port,
+                                                const std::string &public_key_path,
+                                                const std::string &private_key_path) {
+  std::vector<std::string> arguments = {"program_name", "--mode", "server",
+                                        "--port", std::to_string(port),
+                                        "--public-key", public_key_path,
+                                        "--private-key", private_key_path};
 
   return ParseFromVector(arguments);
 }
 
-void TestServer(int port, std::string &public_key_path, std::string &private_key_path) {
+void TestServer(int port, const std::string &public_key_path, const std::string &private_key_path) {
   auto config = GetServerConfig(port, public_key_path, private_key_path);
   auto &server_config = dynamic_cast<config::ServerConfig &>(*config);
 

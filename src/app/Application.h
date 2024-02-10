@@ -25,7 +25,7 @@ using namespace std::literals;
 class Application {
  public:
   void Send(std::string_view ip, int port, fs::path file_path);
-  void Listen(int port, const std::string &public_rsa_key, const std::string &private_rsa_key);
+  fs::path Listen(int port, const std::string &public_rsa_key, const std::string &private_rsa_key);
 };
 
 }  // namespace app

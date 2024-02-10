@@ -30,4 +30,4 @@ std::unique_ptr<config::Config> ParseFromVector(const std::vector<std::string> &
   DeleteArgv(argc, argv);
 
   return config;
-};
+}

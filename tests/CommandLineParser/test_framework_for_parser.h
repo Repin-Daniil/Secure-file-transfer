@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+#include <memory>
+#include <vector>
+
 #include "../../src/util/parser/command_line_parser.h"
 
 char **MakeArgv(const std::vector<std::string> &args);

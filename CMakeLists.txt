@@ -17,10 +17,7 @@ endif ()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-
-add_executable(safe_file_transfer
-        src/main.cpp
-
+add_library(SFT STATIC
         src/constants_storage.h
         src/app/Application.h
         src/network/Server.h
@@ -36,14 +33,33 @@ add_executable(safe_file_transfer
         src/util/parser/command_line_parser.cpp
         src/config.h src/util/logger/logger.cpp)
 
+add_executable(safe_file_transfer src/main.cpp)
+
 target_link_libraries(safe_file_transfer PRIVATE
+        SFT
         Threads::Threads
         OpenSSL::SSL
         OpenSSL::Crypto
         CONAN_PKG::boost)
 
-# Tests
+
 enable_testing()
+
+# Smoke Test
+add_executable(smoke_test tests/Application/smoke_test.cpp)
+
+target_link_libraries(smoke_test PRIVATE
+        SFT
+        CONAN_PKG::gtest
+        CONAN_PKG::boost
+        Threads::Threads
+        OpenSSL::SSL
+        OpenSSL::Crypto)
+
+add_test(NAME SMOKE_TEST COMMAND smoke_test)
+
+
+# Parser Test
 add_executable(ParserTest src/util/parser/command_line_parser.cpp
         tests/CommandLineParser/test_framework_for_parser.cpp
         tests/CommandLineParser/client_config_tests.cpp
@@ -51,4 +67,5 @@ add_executable(ParserTest src/util/parser/command_line_parser.cpp
         tests/CommandLineParser/general_tests.cpp)
 
 target_link_libraries(ParserTest PRIVATE CONAN_PKG::catch2 CONAN_PKG::boost)
+
 add_test(NAME PARSER_TEST COMMAND ParserTest)

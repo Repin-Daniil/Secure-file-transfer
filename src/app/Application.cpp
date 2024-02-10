@@ -23,7 +23,7 @@ void Application::Send(std::string_view server_ip,
                    {encrypted_file_path, std::ios::binary}});
 }
 
-void Application::Listen(int port,
+fs::path Application::Listen(int port,
                          const std::string &public_rsa_key,
                          const std::string &private_rsa_key) {
   network::Server server;
@@ -38,6 +38,8 @@ void Application::Listen(int port,
   std::string decrypted_file_name = crypto.DecryptFile(encrypted_file_path);
 
   LogInfo("Save file to "s + decrypted_file_name);
+
+  return decrypted_file_name;
 }
 
 }  // namespace app
