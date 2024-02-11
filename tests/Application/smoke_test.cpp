@@ -14,7 +14,7 @@ struct ScopedLogDisable {
   }
 
   ~ScopedLogDisable() {
-    boost::log::core::get()->reset_filter();
+    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
   }
 };
 
