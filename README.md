@@ -1,29 +1,36 @@
-# Подготовка
+# Secure File Transfer
 
-### Установка
-
+## Запуск через Docker
+### Подготовка
 ```shell
-mkdir build
-cd build
-pip3 install conan==1.*
-conan install .. --build=missing -s build_type=Release -s compiler.libcxx=libstdc++11
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-cmake --build . --target all        
+sudo docker build -t secure_file_transfer .
+sudo docker run --rm -it -p 3333:3333 secure_file_transfer
+```
+### Smoke-тест
+```shell
+./smoke_test
 ```
 
-### Создание ключей (для сервера)
+1) Запускается сервер на порту 3333
+2) Создается клиент, отправляется файл package.txt
+3) Сравниваются аттрибуты и содержимое изначального файла с полученным
 
+### Запуск сервера. Пример приема файла
 ```shell
-openssl genrsa -out res/private_key.pem 1024
-openssl rsa -in res/private_key.pem -outform PEM -pubout -out res/public_key.pem
+./secure_file_transfer --mode server --port 3333 --public-key ../res/public_key.pem \
+                                                 --private-key ../res/private_key.pem
 ```
 
-# Запуск
+### Запуск клиента. Пример отправки файла
+
+```shell
+./secure_file_transfer --mode client --address 127.0.0.1/3333 --package ../res/package.txt
+```
 
 ### Справка
 
 ```shell
-./build/bin/safe_file_transfer --help
+./secure_file_transfer --help
 ```
 
 ```
@@ -42,32 +49,30 @@ Client options:
 --packages path        Set path to files
 ```
 
-### Запуск Сервера. Пример приема файла
+## Вручную
 
+### Установка
 ```shell
-sudo ./build/bin/safe_file_transfer --mode server --port 3333 --public-key res/public_key.pem --private-key res/private_key.pem
+mkdir build
+cd build
+pip3 install conan==1.*
+conan install .. --build=missing -s build_type=Release -s compiler.libcxx=libstdc++11
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+cmake --build . --target all        
 ```
 
-### Запуск клиента. Пример отправки файла
-
+### Создание ключей (для сервера)
 ```shell
-./build/bin/safe_file_transfer --mode client --address 127.0.0.1/3333 --package res/package.txt
+openssl genrsa -out res/private_key.pem 1024
+openssl rsa -in res/private_key.pem -outform PEM -pubout -out res/public_key.pem
 ```
 
 ### Запуск тестов
-
-##### Catch2
-
-```shell
-./build/bin/ParserTest
-```
-
-##### CTest
-
 ```shell
 ctest --extra-verbose --test-dir build
 ```
-# Архитектура
+
+## Архитектура
 ### UML-диаграмма приложения
 
 ![](res/UML.png)
