@@ -39,7 +39,7 @@ bool AreFilesEqual(const fs::path file_1, const fs::path &file_2) {
   return true;
 }
 
-TEST(SafeFileTransfer, SmokeTest) {
+TEST(SecureFileTransfer, SmokeTest) {
   // Arrange
   ScopedLogDisable disable_logger;
 

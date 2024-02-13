@@ -33,9 +33,9 @@ add_library(SFT STATIC
         src/util/parser/command_line_parser.cpp
         src/config.h src/util/logger/logger.cpp)
 
-add_executable(safe_file_transfer src/main.cpp)
+add_executable(secure_file_transfer src/main.cpp)
 
-target_link_libraries(safe_file_transfer PRIVATE
+target_link_libraries(secure_file_transfer PRIVATE
         SFT
         Threads::Threads
         OpenSSL::SSL
