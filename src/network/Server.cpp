@@ -3,13 +3,14 @@
 namespace network {
 
 using constants::NetworkConstants;
+using constants::LogTag;
 
 std::string Server::Start(int port) {
   boost::system::error_code ec;
 
   std::filesystem::create_directory(std::filesystem::current_path().c_str() + "/tmp"s);
-  LogInfo("Server start"sv);
-  LogInfo("Waiting for connection"sv);
+  LogInfo(LogTag::SERVER, "Server start"sv);
+  LogInfo(LogTag::SERVER, "Waiting for connection"sv);
 
   tcp::acceptor acceptor(io_context_, tcp::endpoint(tcp::v4(), port));
   acceptor.accept(socket_, ec);
@@ -18,11 +19,11 @@ std::string Server::Start(int port) {
     throw std::runtime_error("Can`t accept connection");
   }
 
-  LogInfo("Accept connection"sv);
+  LogInfo(LogTag::SERVER, "Accept connection"sv);
 
-  LogTrace("Read Client Request"sv);
+  LogTrace(LogTag::SERVER, "Read Client Request"sv);
   auto request = Read();
-  LogTrace(request);
+  LogTrace(LogTag::SERVER, request);
 
   return request;
 }
@@ -30,22 +31,22 @@ std::string Server::Start(int port) {
 void Server::SendPublicKey(const std::string &public_key) {
   boost::system::error_code ec;
 
-  LogTrace("Send Public key to client");
+  LogTrace(LogTag::SERVER, "Send Public key to client");
   Send({NetworkConstants::PUBLIC_KEY_HEADER, public_key});
 }
 
 fs::path Server::DownloadFile() {
   boost::system::error_code ec;
 
-  LogTrace("Reading file attributes"sv);
+  LogTrace(LogTag::SERVER, "Reading file attributes"sv);
   auto request = Read();
   auto file_data = GetNameAndSize(request);
 
   std::string file_name = file_data.first;
   uint64_t file_size = file_data.second;
 
-  LogTrace("File name: "s + file_name);
-  LogTrace("File size: "s + std::to_string(file_size));
+  LogTrace(LogTag::SERVER, "File name: "s + file_name);
+  LogTrace(LogTag::SERVER, "File size: "s + std::to_string(file_size));
 
   auto path = fs::current_path().c_str() + "/tmp/"s + file_name;
   std::ofstream output_file_stream(path, std::ios::binary);
@@ -54,7 +55,7 @@ fs::path Server::DownloadFile() {
     throw std::runtime_error("Can't create file");
   }
 
-  LogInfo("Download started"sv);
+  LogInfo(LogTag::SERVER, "Download started"sv);
 
   net::streambuf buffer;
   boost::timer::progress_display progress_bar(file_size);
@@ -73,11 +74,11 @@ fs::path Server::DownloadFile() {
   auto end = std::chrono::steady_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
 
-  LogInfo("Download complete"sv);
-  LogTrace("Received bytes: "s + std::to_string(progress_bar.count()));
-  LogTrace("Loading time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
+  LogInfo(LogTag::SERVER, "Download complete"sv);
+  LogTrace(LogTag::SERVER, "Received bytes: "s + std::to_string(progress_bar.count()));
+  LogTrace(LogTag::SERVER, "Loading time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
 
-  LogTrace("Send status to client");
+  LogTrace(LogTag::SERVER, "Send status to client");
   Send({NetworkConstants::OK});
 
   return path;
@@ -109,7 +110,7 @@ std::string Server::Read() {
   std::string request{std::istreambuf_iterator<char>(&stream_buf),
                       std::istreambuf_iterator<char>()};
 
-  LogTrace("Request: "s + request);
+  LogTrace(LogTag::SERVER, "Request: "s + request);
 
   return request;
 }
@@ -123,7 +124,7 @@ void Server::Send(const std::vector<std::string_view> &response) {
   }
 
   ss << NetworkConstants::CRLF;
-  LogTrace("Response: "s + ss.str());
+  LogTrace(LogTag::SERVER, "Response: "s + ss.str());
 
   socket_.write_some(net::buffer(ss.str()), ec);
 

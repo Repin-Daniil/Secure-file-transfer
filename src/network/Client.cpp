@@ -3,6 +3,7 @@
 namespace network {
 
 using constants::NetworkConstants;
+using constants::LogTag;
 
 void Client::Connect(std::string_view ip_address, int port) {
   boost::system::error_code ec;
@@ -18,16 +19,16 @@ void Client::Connect(std::string_view ip_address, int port) {
     throw std::runtime_error("Can't connect to server");
   }
 
-  LogInfo("Connect to server"sv);
+  LogInfo(LogTag::CLIENT, "Connect to server"sv);
 }
 
 std::string Client::RequestServerPublicKey() {
   boost::system::error_code ec;
 
-  LogTrace("Request Public Key from server");
+  LogTrace(LogTag::CLIENT, "Request Public Key from server");
   Send({NetworkConstants::REQUEST_FOR_PUBLIC_KEY});
 
-  LogTrace("Read Public Key"sv);
+  LogTrace(LogTag::CLIENT, "Read Public Key"sv);
   auto public_key = GetPublicKeyFromResponse(Read());
 
   return public_key;
@@ -42,10 +43,10 @@ void Client::SendFile(Package package) {
   file_name << NetworkConstants::FILE_NAME_HEADER << package.file_name;
   file_size << NetworkConstants::FILE_SIZE_HEADER << std::to_string(package.file_size);
 
-  LogTrace("Send file name and size"sv);
+  LogTrace(LogTag::CLIENT, "Send file name and size"sv);
   Send({file_name.str(), file_size.str()});
 
-  LogInfo("Upload start"sv);
+  LogInfo(LogTag::CLIENT, "Upload start"sv);
 
   boost::timer::progress_display progress_bar(package.file_size);
   auto start = std::chrono::steady_clock::now();
@@ -60,7 +61,7 @@ void Client::SendFile(Package package) {
 
   package.stream.close();
 
-  LogTrace("Bytes sent: "s + std::to_string(progress_bar.count()));
+  LogTrace(LogTag::CLIENT, "Bytes sent: "s + std::to_string(progress_bar.count()));
 
   if (progress_bar.count() != package.file_size) {
     throw std::runtime_error("Package sending failed");
@@ -69,13 +70,13 @@ void Client::SendFile(Package package) {
   auto end = std::chrono::steady_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
 
-  LogTrace("File Name: "s + package.file_name);
-  LogTrace("File Size: "s + std::to_string(package.file_size));
+  LogTrace(LogTag::CLIENT, "File Name: "s + package.file_name);
+  LogTrace(LogTag::CLIENT, "File Size: "s + std::to_string(package.file_size));
 
-  LogInfo("Waiting for server's response");
+  LogInfo(LogTag::CLIENT, "Waiting for server's response");
   auto response = Read();
 
-  LogInfo(response);
+  LogInfo(LogTag::CLIENT, response);
 }
 
 std::string Client::GetPublicKeyFromResponse(const std::string &response) {
@@ -104,7 +105,7 @@ std::string Client::Read() {
   std::string request{std::istreambuf_iterator<char>(&stream_buf),
                       std::istreambuf_iterator<char>()};
 
-  LogTrace("Response: "s + request);
+  LogTrace(LogTag::CLIENT, "Response: "s + request);
 
   return request;
 }
@@ -118,7 +119,7 @@ void Client::Send(const std::vector<std::string_view> &response) {
   }
 
   ss << NetworkConstants::CRLF;
-  LogTrace("Request: "s + ss.str());
+  LogTrace(LogTag::CLIENT, "Request: "s + ss.str());
 
   socket_.write_some(net::buffer(ss.str()), ec);
 

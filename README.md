@@ -1,12 +1,30 @@
 # Secure File Transfer
 
+## Описание
+Консольное приложение для защищенного обмена файлами в сети.
+
+В качестве протокола транспортного уровня выбран TCP, так как требуются гарантии доставки и верный порядок
+получения пакетов. Для работы через TCP-сокет используется библиотека Boost.Asio.
+
+ Для защиты файлов применяется алгоритм асимметричного шифрования RSA. Криптографические преобразования выполняются посредством библиотеки
+OpenSSL. Клиент и сервер обязаны обладать соответствующими сертификатами, с длиной ключа
+RSA не менее 1024 бит.
+
+
+
 ## Запуск через Docker
+
+Для удобства в контейнере уже будут находиться ключи RSA и файл для отправки.
+
 ### Подготовка
+
 ```shell
 sudo docker build -t secure_file_transfer .
 sudo docker run --rm -it -p 3333:3333 secure_file_transfer
 ```
+
 ### Smoke-тест
+
 ```shell
 ./smoke_test
 ```
@@ -16,6 +34,7 @@ sudo docker run --rm -it -p 3333:3333 secure_file_transfer
 3) Сравниваются аттрибуты и содержимое изначального файла с полученным
 
 ### Запуск сервера. Пример приема файла
+
 ```shell
 ./secure_file_transfer --mode server --port 3333 --public-key ../res/public_key.pem \
                                                  --private-key ../res/private_key.pem
@@ -52,6 +71,7 @@ Client options:
 ## Вручную
 
 ### Установка
+
 ```shell
 mkdir build
 cd build
@@ -62,17 +82,20 @@ cmake --build . --target all
 ```
 
 ### Создание ключей (для сервера)
+
 ```shell
 openssl genrsa -out res/private_key.pem 1024
 openssl rsa -in res/private_key.pem -outform PEM -pubout -out res/public_key.pem
 ```
 
 ### Запуск тестов
+
 ```shell
 ctest --extra-verbose --test-dir build
 ```
 
 ## Архитектура
+
 ### UML-диаграмма приложения
 
 ![](res/UML.png)

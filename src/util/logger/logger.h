@@ -8,7 +8,7 @@
 
 void LoggerInit();
 
-void LogInfo(std::string_view msg);
-void LogError(std::string_view msg);
 void LogFatal(std::string_view msg);
-void LogTrace(std::string_view msg);
+void LogInfo(std::string_view tag, std::string_view msg);
+void LogError(std::string_view tag, std::string_view msg);
+void LogTrace(std::string_view tag, std::string_view msg);

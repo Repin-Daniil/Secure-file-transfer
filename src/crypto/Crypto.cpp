@@ -2,6 +2,8 @@
 
 namespace crypto {
 
+using constants::LogTag;
+
 // FIXME
 
 std::string Crypto::GetPublicKeyAsString() {
@@ -232,7 +234,7 @@ std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
     throw std::runtime_error("Error: Unable to create combined output file");
   }
 
-  LogInfo("Start encrypting"s);
+  LogInfo(LogTag::CLIENT, "Start encrypting"s);
 
   boost::timer::progress_display progress_bar(std::filesystem::file_size(file_path));
   auto start = std::chrono::steady_clock::now();
@@ -255,8 +257,8 @@ std::filesystem::path Crypto::EncryptFile(std::filesystem::path file_path) {
   auto end = std::chrono::steady_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
 
-  LogInfo("Encrypted"sv);
-  LogTrace("Encryption time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
+  LogInfo(LogTag::CLIENT, "Encrypted"sv);
+  LogTrace(LogTag::CLIENT, "Encryption time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
 
   return output_file_path;
 }
@@ -280,7 +282,7 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
     throw std::runtime_error("Error: Unable to create output file");
   }
 
-  LogInfo("Start decrypting"s);
+  LogInfo(LogTag::SERVER, "Start decrypting"s);
   auto start = std::chrono::steady_clock::now();
 
   std::streamsize block_size = 20480;
@@ -303,8 +305,8 @@ std::string Crypto::DecryptFile(std::filesystem::path file_path) {
   auto end = std::chrono::steady_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
 
-  LogInfo("Decrypted!"sv);
-  LogTrace("Decryption time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
+  LogInfo(LogTag::SERVER, "Decrypted!"sv);
+  LogTrace(LogTag::SERVER, "Decryption time: "s + std::to_string(elapsed_seconds.count()) + " seconds"s);
 
   return output_file_path.string();
 }

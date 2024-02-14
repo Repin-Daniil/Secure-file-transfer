@@ -3,6 +3,7 @@
 namespace app {
 
 using constants::NetworkConstants;
+using constants::LogTag;
 
 void Application::Send(std::string_view server_ip,
                        int port,
@@ -37,7 +38,7 @@ fs::path Application::Listen(int port,
   auto encrypted_file_path = server.DownloadFile();
   std::string decrypted_file_name = crypto.DecryptFile(encrypted_file_path);
 
-  LogInfo("Save file to "s + decrypted_file_name);
+  LogInfo(LogTag::SERVER, "Save file to "s + decrypted_file_name);
 
   return decrypted_file_name;
 }

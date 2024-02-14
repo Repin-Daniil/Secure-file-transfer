@@ -8,16 +8,6 @@ namespace {
 
 namespace fs = std::filesystem;
 
-struct ScopedLogDisable {
-  ScopedLogDisable() {
-    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::fatal);
-  }
-
-  ~ScopedLogDisable() {
-    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
-  }
-};
-
 }  // namespace
 
 bool AreFilesEqual(const fs::path file_1, const fs::path &file_2) {
@@ -41,7 +31,7 @@ bool AreFilesEqual(const fs::path file_1, const fs::path &file_2) {
 
 TEST(SecureFileTransfer, SmokeTest) {
   // Arrange
-  ScopedLogDisable disable_logger;
+  LoggerInit();
 
   app::Application server;
   app::Application client;

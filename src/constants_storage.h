@@ -83,4 +83,10 @@ struct NetworkConstants {
   constexpr static std::string_view FAILED = "FAILED"sv;
 };
 
+struct LogTag {
+  LogTag() = delete;
+
+  constexpr static std::string_view SERVER = "[SERVER]"sv;
+  constexpr static std::string_view CLIENT = "[CLIENT]"sv;
+};
 }  // namespace constants
