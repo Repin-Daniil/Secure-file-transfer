@@ -1,6 +1,5 @@
 #include <iostream>
 
-
 #include "util/logger/logger.h"
 #include "util/parser/command_line_parser.h"
 #include "app/Application.h"

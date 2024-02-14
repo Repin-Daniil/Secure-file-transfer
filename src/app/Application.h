@@ -5,10 +5,10 @@
 #include <iostream>
 #include <string>
 
-#include "../network/Server.h"
-#include "../network/Client.h"
-#include "../crypto/Crypto.h"
-#include "../util/logger/logger.h"
+#include "network/Server.h"
+#include "network/Client.h"
+#include "crypto/Crypto.h"
+#include "util/logger/logger.h"
 
 namespace app {
 

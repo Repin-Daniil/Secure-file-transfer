@@ -11,9 +11,9 @@
 #include <boost/program_options.hpp>
 #include <boost/asio/ip/address.hpp>
 
-#include "../../config.h"
-#include "../../constants_storage.h"
-#include "../logger/logger.h"
+#include "config.h"
+#include "constants_storage.h"
+#include "util/logger/logger.h"
 
 namespace util {
 

@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <fstream>
 
-#include "../../src/config.h"
-#include "../../src/app/Application.h"
+#include "config.h"
+#include "app/Application.h"
 
 namespace {
 
@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 
 }  // namespace
 
-bool AreFilesEqual(const fs::path file_1, const fs::path &file_2) {
+bool AreFilesEqual(const fs::path &file_1, const fs::path &file_2) {
   std::ifstream stream_1(file_1, std::ios::binary);
   std::ifstream stream_2(file_2, std::ios::binary);
 

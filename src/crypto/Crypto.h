@@ -13,8 +13,8 @@
 
 #include <boost/timer/progress_display.hpp>
 
-#include "../util/logger/logger.h"
-#include "../constants_storage.h"
+#include "constants_storage.h"
+#include "util/logger/logger.h"
 
 namespace crypto {
 
