@@ -6,9 +6,10 @@
 
 using namespace std::literals;
 using config::Mode;
+using logger::LogFatal;
 
 int main(int argc, char *argv[]) {
-  LoggerInit();
+  logger::LoggerInit();
 
   try {
     app::Application app;

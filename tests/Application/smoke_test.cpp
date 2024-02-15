@@ -31,7 +31,7 @@ bool AreFilesEqual(const fs::path &file_1, const fs::path &file_2) {
 
 TEST(SecureFileTransfer, SmokeTest) {
   // Arrange
-  LoggerInit();
+  logger::LoggerInit();
 
   app::Application server;
   app::Application client;

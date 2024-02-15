@@ -3,6 +3,8 @@
 namespace crypto {
 
 using constants::LogTag;
+using logger::LogInfo;
+using logger::LogTrace;
 
 // FIXME
 

@@ -20,6 +20,8 @@ namespace net = boost::asio;
 namespace ip = net::ip;
 
 using ip::tcp;
+using logger::LogInfo;
+using logger::LogTrace;
 using namespace std::literals;
 
 struct Package {

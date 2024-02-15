@@ -1,11 +1,9 @@
 #include "util/logger/logger.h"
 
-namespace {
+namespace logger {
 
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
-
-}
 
 void LoggerInit() {
   logging::add_common_attributes();
@@ -33,3 +31,5 @@ void LogFatal(std::string_view msg) {
 void LogTrace(std::string_view tag, std::string_view msg) {
   BOOST_LOG_TRIVIAL(trace) << tag << " " << msg;
 }
+
+}  // namespace logger

@@ -4,6 +4,8 @@ namespace network {
 
 using constants::NetworkConstants;
 using constants::LogTag;
+using logger::LogInfo;
+using logger::LogTrace;
 
 std::string Server::Start(int port) {
   boost::system::error_code ec;

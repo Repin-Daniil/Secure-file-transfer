@@ -26,7 +26,7 @@ using namespace std::literals;
 
 /*!
  * @brief Сервер для приема файлов
- * @todo перевести логику обработки из app в Server. Больше асинхронщины
+ * @todo Нужен свой progress bar
  */
 class Server {
  public:

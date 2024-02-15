@@ -17,7 +17,7 @@ COPY ./res /app/res
 COPY CMakeLists.txt /app/
 
 RUN cd /app/build && \
-        cmake .. -DCMAKE_BUILD_TYPE=Debug && \
+        cmake .. -DCMAKE_BUILD_TYPE=Release && \
         cmake --build . --target all
 
 FROM ubuntu:22.04 as run

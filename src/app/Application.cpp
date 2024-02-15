@@ -4,6 +4,7 @@ namespace app {
 
 using constants::NetworkConstants;
 using constants::LogTag;
+using logger::LogInfo;
 
 void Application::Send(std::string_view server_ip,
                        int port,

@@ -21,6 +21,7 @@ using namespace std::literals;
  * @todo Если файлов несколько, то паковать в zip-архив
  * @todo Добавить контрольную сумму
  * @todo Сделать broadcast отправку
+ * @todo Пусть контекст хранится здесь
  */
 class Application {
  public:
