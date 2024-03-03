@@ -19,10 +19,14 @@ namespace network {
 namespace net = boost::asio;
 namespace ip = net::ip;
 
+using namespace std::literals;
+
 using ip::tcp;
+using constants::LogTag;
 using logger::LogInfo;
 using logger::LogTrace;
-using namespace std::literals;
+using constants::ExceptionMessage;
+using constants::NetworkConstants;
 
 struct Package {
   std::string file_name;
@@ -30,10 +34,6 @@ struct Package {
   std::ifstream stream;
 };
 
-/*!
- * @brief Класс для отправки файлов по TCP
- * @todo Ну разным серверам можно в разных потоках отправлять
- */
 class Client {
  public:
   void Connect(std::string_view ip_address, int port);

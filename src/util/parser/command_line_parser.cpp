@@ -2,10 +2,11 @@
 
 namespace util {
 
+namespace po = boost::program_options;
+
 std::unique_ptr<config::Config> CommandLineParser::ParseCommandLine(int argc, const char *const argv[]) {
   using constants::ProgramOptions;
   using constants::ExceptionMessage;
-  namespace po = boost::program_options;
 
   po::options_description desc(ProgramOptions::GENERAL_OPTIONS.data());
   po::options_description server_options_description(ProgramOptions::SERVER_OPTIONS.data());
@@ -68,7 +69,7 @@ std::unique_ptr<config::Config> CommandLineParser::ParseCommandLine(int argc, co
       throw std::runtime_error(ExceptionMessage::WRONG_SERVER_CONFIG.data());
     }
 
-    if (args_.port < 0 || args_.port > 65535) {
+    if (args_.port < NetworkConstants::kFirstPort || args_.port > NetworkConstants::kLastPort) {
       throw std::runtime_error(constants::ExceptionMessage::NON_EXISTENT_PORT.data());
     }
 
@@ -94,14 +95,16 @@ std::unique_ptr<config::Config> CommandLineParser::ParseCommandLine(int argc, co
 }
 
 config::ClientConfig::Address CommandLineParser::ConvertStrToAddress(const std::string &str) {
+  const int beginning = 0;
+
   std::string delimiter = constants::ProgramOptions::ADDRESSES_DELIMITER.data();
   auto delimiter_pos = str.find(delimiter);
 
-  if (delimiter_pos == std::string::npos || delimiter_pos == 0) {
+  if (delimiter_pos == std::string::npos || delimiter_pos == beginning) {
     throw std::runtime_error(constants::ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
   }
 
-  std::string ip = str.substr(0, delimiter_pos);
+  std::string ip = str.substr(beginning, delimiter_pos);
 
   int port = -1;
 
@@ -118,7 +121,7 @@ config::ClientConfig::Address CommandLineParser::ConvertStrToAddress(const std::
     throw std::runtime_error(constants::ExceptionMessage::NON_EXISTENT_IP.data());
   }
 
-  if (port < 0 || port > 65535) {
+  if (port < NetworkConstants::kFirstPort || port > NetworkConstants::kLastPort) {
     throw std::runtime_error(constants::ExceptionMessage::NON_EXISTENT_PORT.data());
   }
 

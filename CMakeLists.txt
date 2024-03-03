@@ -20,18 +20,22 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 add_library(SFT STATIC
         src/constants_storage.h
-        src/app/Application.h
-        src/network/Server.h
-        src/network/Client.h
-        src/crypto/Crypto.h
-        src/util/parser/command_line_parser.h
-        src/util/logger/logger.h
 
+        src/app/Application.h
         src/app/Application.cpp
-        src/network/Client.cpp
+
+        src/network/Server.h
         src/network/Server.cpp
+        src/network/Client.h
+        src/network/Client.cpp
+
+        src/crypto/Crypto.h
         src/crypto/Crypto.cpp
+
+        src/util/parser/command_line_parser.h
         src/util/parser/command_line_parser.cpp
+
+        src/util/logger/logger.h
         src/config.h src/util/logger/logger.cpp)
 
 add_executable(secure_file_transfer src/main.cpp)

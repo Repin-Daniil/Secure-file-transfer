@@ -2,15 +2,11 @@
 
 namespace app {
 
-using constants::NetworkConstants;
-using constants::LogTag;
-using logger::LogInfo;
-
 void Application::Send(std::string_view server_ip,
                        int port,
                        fs::path file_path) {
   if (!fs::exists(file_path)) {
-    throw std::runtime_error("File not found!");
+    throw std::runtime_error(ExceptionMessage::NO_FILE.data());
   }
 
   network::Client client;

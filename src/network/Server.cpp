@@ -2,11 +2,6 @@
 
 namespace network {
 
-using constants::NetworkConstants;
-using constants::LogTag;
-using logger::LogInfo;
-using logger::LogTrace;
-
 std::string Server::Start(int port) {
   boost::system::error_code ec;
 
@@ -18,7 +13,7 @@ std::string Server::Start(int port) {
   acceptor.accept(socket_, ec);
 
   if (ec) {
-    throw std::runtime_error("Can`t accept connection");
+    throw std::runtime_error(ExceptionMessage::NO_ACCEPT.data());
   }
 
   LogInfo(LogTag::SERVER, "Accept connection"sv);
@@ -54,7 +49,7 @@ fs::path Server::DownloadFile() {
   std::ofstream output_file_stream(path, std::ios::binary);
 
   if (!output_file_stream) {
-    throw std::runtime_error("Can't create file");
+    throw std::runtime_error(ExceptionMessage::FILE_CREATION_ERROR.data());
   }
 
   LogInfo(LogTag::SERVER, "Download started"sv);
@@ -96,7 +91,7 @@ std::pair<std::string, uint64_t> Server::GetNameAndSize(const std::string &input
     }
   }
 
-  throw std::runtime_error("Error, Wrong Format of File attributes!");
+  throw std::runtime_error(ExceptionMessage::NO_FILE_ATTRIBUTES.data());
 }
 
 std::string Server::Read() {
@@ -106,7 +101,7 @@ std::string Server::Read() {
   net::read_until(socket_, stream_buf, NetworkConstants::DOUBLE_CRLF, ec);
 
   if (ec) {
-    throw std::runtime_error("Error while reading request");
+    throw std::runtime_error(ExceptionMessage::READING_ERROR.data());
   }
 
   std::string request{std::istreambuf_iterator<char>(&stream_buf),
@@ -131,7 +126,7 @@ void Server::Send(const std::vector<std::string_view> &response) {
   socket_.write_some(net::buffer(ss.str()), ec);
 
   if (ec) {
-    throw std::runtime_error("Error while sending response");
+    throw std::runtime_error(ExceptionMessage::SENDING_ERROR.data());
   }
 }
 }  // namespace network

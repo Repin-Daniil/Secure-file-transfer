@@ -20,13 +20,8 @@ namespace util {
 namespace fs = std::filesystem;
 
 using namespace std::literals;
+using constants::NetworkConstants;
 
-/*!
- * @brief Парсер командной строки
- * @todo Добавить JSON конфиг, тогда надо будет разделить на ConfigLoader, JsonLoader, CommandLineParser
- * @todo  Добавить параметр --broadcast для отправки файлов всем сразу
- * @todo  Посылки нужно обрамлять в фигурные скобки
- */
 class CommandLineParser {
  public:
   std::unique_ptr<config::Config> ParseCommandLine(int argc, const char *const argv[]);

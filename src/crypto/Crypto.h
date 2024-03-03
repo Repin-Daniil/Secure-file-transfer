@@ -18,12 +18,16 @@
 
 namespace crypto {
 
+using constants::LogTag;
+using logger::LogInfo;
+using logger::LogTrace;
+
 using namespace std::literals;
 
 class Crypto {
  public:
-  explicit Crypto(std::string public_key);
-  Crypto(std::string public_key_path, std::string private_key_path);
+  explicit Crypto(const std::string &public_key);
+  Crypto(const std::string &public_key_path, const std::string &private_key_path);
   ~Crypto();
 
   std::filesystem::path EncryptFile(std::filesystem::path file_path);

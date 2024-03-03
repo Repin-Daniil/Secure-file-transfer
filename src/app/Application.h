@@ -14,15 +14,13 @@ namespace app {
 
 namespace fs = std::filesystem;
 
+using constants::NetworkConstants;
+using constants::ExceptionMessage;
+using constants::LogTag;
+using logger::LogInfo;
+
 using namespace std::literals;
 
-/*!
- * @brief
- * @todo Если файлов несколько, то паковать в zip-архив
- * @todo Добавить контрольную сумму
- * @todo Сделать broadcast отправку
- * @todo Пусть контекст хранится здесь
- */
 class Application {
  public:
   void Send(std::string_view ip, int port, fs::path file_path);

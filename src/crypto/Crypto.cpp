@@ -2,12 +2,6 @@
 
 namespace crypto {
 
-using constants::LogTag;
-using logger::LogInfo;
-using logger::LogTrace;
-
-// FIXME
-
 std::string Crypto::GetPublicKeyAsString() {
   BIO *bio = BIO_new(BIO_s_mem());
   PEM_write_bio_RSA_PUBKEY(bio, public_key_);
@@ -24,13 +18,13 @@ std::string Crypto::GetPublicKeyAsString() {
 RSA *Crypto::CreatePublicKeyFromString(const std::string &pem_string) {
   BIO *bio = BIO_new_mem_buf(pem_string.c_str(), pem_string.size());
 
-  if (bio == NULL) {
+  if (bio == nullptr) {
     std::cerr << "Failed to create mem BIO" << std::endl;
     return nullptr;
   }
 
-  RSA *rsa = PEM_read_bio_RSA_PUBKEY(bio, NULL, NULL, NULL);
-  if (rsa == NULL) {
+  RSA *rsa = PEM_read_bio_RSA_PUBKEY(bio, nullptr, nullptr, nullptr);
+  if (rsa == nullptr) {
     std::cerr << "Failed to create RSA from PEM string" << std::endl;
   }
 
@@ -47,7 +41,7 @@ RSA *Crypto::ReadPublicKeyFromPEM(const std::string &public_key_file_path) {
     return nullptr;
   }
 
-  RSA *rsa = PEM_read_RSA_PUBKEY(public_key_file, NULL, NULL, NULL);
+  RSA *rsa = PEM_read_RSA_PUBKEY(public_key_file, nullptr, nullptr, nullptr);
 
   if (!rsa) {
     std::cerr << "Failed to read public key from PEM file" << std::endl;
@@ -69,11 +63,12 @@ RSA *Crypto::ReadPrivateKeyFromPEM(const std::string &private_key_file_path) {
     return nullptr;
   }
 
-  RSA *rsa = PEM_read_RSAPrivateKey(private_key_file, NULL, NULL, NULL);
+  RSA *rsa = PEM_read_RSAPrivateKey(private_key_file, nullptr, nullptr, nullptr);
 
   if (!rsa) {
     std::cerr << "Failed to read private key from PEM file" << std::endl;
     fclose(private_key_file);
+
     return nullptr;
   }
 
@@ -175,7 +170,7 @@ std::vector<unsigned char> Crypto::DecryptWithPrivateKey(const std::vector<unsig
   return decrypted_data;
 }
 
-Crypto::Crypto(std::string public_key) {
+Crypto::Crypto(const std::string &public_key) {
   try {
     public_key_ = CreatePublicKeyFromString(public_key);
   } catch (std::exception &e) {
@@ -185,7 +180,7 @@ Crypto::Crypto(std::string public_key) {
   keys_.first = true;
 }
 
-Crypto::Crypto(std::string public_key_path, std::string private_key_path) {
+Crypto::Crypto(const std::string& public_key_path, const std::string &private_key_path) {
   try {
     public_key_ = Crypto::ReadPublicKeyFromPEM(public_key_path);
   } catch (std::exception &e) {

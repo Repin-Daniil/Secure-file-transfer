@@ -21,13 +21,15 @@ namespace net = boost::asio;
 namespace fs = std::filesystem;
 namespace ip = net::ip;
 
-using ip::tcp;
 using namespace std::literals;
 
-/*!
- * @brief Сервер для приема файлов
- * @todo Нужен свой progress bar
- */
+using ip::tcp;
+using constants::LogTag;
+using logger::LogInfo;
+using logger::LogTrace;
+using constants::NetworkConstants;
+using constants::ExceptionMessage;
+
 class Server {
  public:
   std::string Start(int port);

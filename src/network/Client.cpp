@@ -2,21 +2,18 @@
 
 namespace network {
 
-using constants::NetworkConstants;
-using constants::LogTag;
-
 void Client::Connect(std::string_view ip_address, int port) {
   boost::system::error_code ec;
   auto endpoint = tcp::endpoint(net::ip::make_address(ip_address, ec), port);
 
   if (ec) {
-    throw std::invalid_argument("Wrong IP Format");
+    throw std::invalid_argument(ExceptionMessage::WRONG_ADDRESS_FORMAT.data());
   }
 
   socket_.connect(endpoint, ec);
 
   if (ec) {
-    throw std::runtime_error("Can't connect to server");
+    throw std::runtime_error(ExceptionMessage::NO_CONNECTION.data());
   }
 
   LogInfo(LogTag::CLIENT, "Connect to server"sv);
@@ -89,7 +86,7 @@ std::string Client::GetPublicKeyFromResponse(const std::string &response) {
     }
   }
 
-  throw std::runtime_error("Wrong Format. No public key");
+  throw std::runtime_error(ExceptionMessage::NO_PUBLIC_KEY.data());
 }
 
 std::string Client::Read() {
@@ -99,7 +96,7 @@ std::string Client::Read() {
   net::read_until(socket_, stream_buf, NetworkConstants::DOUBLE_CRLF, ec);
 
   if (ec) {
-    throw std::runtime_error("Error while reading response");
+    throw std::runtime_error(ExceptionMessage::READING_ERROR.data());
   }
 
   std::string request{std::istreambuf_iterator<char>(&stream_buf),
@@ -124,7 +121,7 @@ void Client::Send(const std::vector<std::string_view> &response) {
   socket_.write_some(net::buffer(ss.str()), ec);
 
   if (ec) {
-    throw std::runtime_error("Error while sending request");
+    throw std::runtime_error(ExceptionMessage::SENDING_ERROR.data());
   }
 }
 

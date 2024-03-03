@@ -17,6 +17,14 @@ struct ExceptionMessage {
   constexpr static std::string_view NO_PACKAGES = "No packages"sv;
   constexpr static std::string_view NON_EXISTENT_PORT = "Non-existent port"sv;
   constexpr static std::string_view NON_EXISTENT_IP = "Non-existent IP"sv;
+  constexpr static std::string_view NO_CONNECTION = "Can't connect to server"sv;
+  constexpr static std::string_view NO_ACCEPT = "Can't accept connection"sv;
+  constexpr static std::string_view NO_PUBLIC_KEY = "Can't parse public key from response"sv;
+  constexpr static std::string_view READING_ERROR = "Error while reading"sv;
+  constexpr static std::string_view SENDING_ERROR = "Error while sending"sv;
+  constexpr static std::string_view FILE_CREATION_ERROR = "Can't create file"sv;
+  constexpr static std::string_view NO_FILE_ATTRIBUTES = "Can't parse file attributes!"sv;
+  constexpr static std::string_view NO_FILE = "File not found!"sv;
 };
 
 struct ProgramOptions {
@@ -66,6 +74,9 @@ struct ProgramOptions {
 
 struct NetworkConstants {
   NetworkConstants() = delete;
+
+  constexpr static int kFirstPort = 0;
+  constexpr static int kLastPort = 65535;
 
   constexpr static std::string_view CRLF = "\r\n"sv;
   constexpr static std::string_view DOUBLE_CRLF = "\r\n\r\n"sv;

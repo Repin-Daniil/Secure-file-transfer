@@ -6,7 +6,8 @@
 #include <filesystem>
 
 namespace config {
-  namespace fs = std::filesystem;
+
+namespace fs = std::filesystem;
 
 enum Mode { NONE, CLIENT, SERVER };
 
